@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block title %}{{ title }} — ManVault{% endblock %}
+{% block content %}<div class="container py-4" style="max-width:600px">
+  <a href="{% url 'accounts:profile' %}" style="color:var(--tx3);font-size:13px;display:inline-flex;align-items:center;gap:6px;margin-bottom:20px">← Back</a>
+  <div class="mv-card p-4">
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;margin-bottom:24px">{{ title }}</h2>
+    <form method="POST">{% csrf_token %}
+      <div class="row g-3">
+        {% for field in form %}<div class="col-12"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">{{ field.label }}</label>{{ field }}{% if field.errors %}<div style="color:#FF3366;font-size:11px">{{ field.errors.0 }}</div>{% endif %}</div>{% endfor %}
+      </div>
+      <div class="d-flex gap-3 mt-4"><button type="submit" class="mv-btn">Save Address</button><a href="{% url 'accounts:profile' %}" class="mv-btn-outline">Cancel</a></div>
+    </form>
+  </div>
+</div>{% endblock %}

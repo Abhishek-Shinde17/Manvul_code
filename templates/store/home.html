@@ -1,0 +1,95 @@
+{% extends 'base.html' %}{% block title %}ManVault — Premium Men's Fashion{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <!-- Hero -->
+  <div style="background:linear-gradient(135deg,var(--bg3),var(--bg2));border:1px solid var(--brd);border-radius:24px;padding:clamp(32px,5vw,72px);margin-bottom:40px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-80px;right:-80px;width:360px;height:360px;background:var(--acc);opacity:.04;border-radius:50%"></div>
+    <span style="background:rgba(200,255,0,.1);color:var(--acc);border:1px solid rgba(200,255,0,.2);border-radius:50px;padding:6px 14px;font-size:11px;font-weight:800;letter-spacing:2px">🔥 NEW SEASON COLLECTION</span>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,6vw,72px);font-weight:700;margin:16px 0;line-height:1">Dress Like You<br><span style="color:var(--acc)">Mean It.</span></h1>
+    <p style="color:var(--tx2);font-size:15px;max-width:480px;line-height:1.7;margin-bottom:24px">Premium men's fashion curated for the modern gentleman. Free shipping above ₹999.</p>
+    <div class="d-flex gap-3 flex-wrap">
+      <a href="{% url 'store:shop' %}" class="mv-btn">Shop Now <i class="bi bi-arrow-right"></i></a>
+      <a href="{% url 'store:offers' %}" class="mv-btn-outline">🏷️ See All Offers</a>
+    </div>
+    <div class="d-flex gap-5 mt-4">
+      <div><div style="font-size:22px;font-weight:800;color:var(--acc)">50k+</div><div style="font-size:10px;color:var(--tx3);letter-spacing:1px">CUSTOMERS</div></div>
+      <div><div style="font-size:22px;font-weight:800;color:var(--acc)">4.9★</div><div style="font-size:10px;color:var(--tx3);letter-spacing:1px">RATING</div></div>
+      <div><div style="font-size:22px;font-weight:800;color:var(--acc)">FREE</div><div style="font-size:10px;color:var(--tx3);letter-spacing:1px">ABOVE ₹999</div></div>
+    </div>
+  </div>
+
+  <!-- Flash Offers Countdown -->
+  {% if flash_offers %}
+  <div class="mb-5">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <h2 class="section-title">⚡ Flash Deals</h2>
+      <div style="background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.4);color:#FF6B35;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:800">LIVE NOW</div>
+    </div>
+    <div class="row g-3">
+      {% for offer in flash_offers %}
+      <div class="col-md-4">
+        <a href="{% url 'store:offers' %}" style="display:block;background:linear-gradient(135deg,var(--bg3),var(--bg2));border:1px solid rgba(255,107,53,.3);border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s" onmouseover="this.style.borderColor='#FF6B35'" onmouseout="this.style.borderColor='rgba(255,107,53,.3)'">
+          <div style="font-size:11px;color:#FF6B35;font-weight:800;letter-spacing:1px;margin-bottom:8px">⚡ {{ offer.get_offer_type_display|upper }}</div>
+          <div style="font-weight:700;font-size:15px;margin-bottom:4px">{{ offer.name }}</div>
+          <div style="font-size:12px;color:var(--tx3);margin-bottom:12px">{{ offer.description|truncatechars:60 }}</div>
+          <div style="font-size:20px;font-weight:800;color:#FF6B35">{{ offer.discount_percent }}% OFF</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:6px">⏱ Ends in {{ offer.time_remaining }}</div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Categories -->
+  {% if categories %}
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <h2 class="section-title">Shop by Category</h2>
+      <a href="{% url 'store:shop' %}" style="font-size:13px;color:var(--tx3)">All →</a>
+    </div>
+    <div class="row g-3">
+      {% for cat in categories %}
+      <div class="col-4 col-md-2">
+        <a href="{% url 'store:category' cat.slug %}" style="display:block;background:var(--bg3);border:1px solid var(--brd);border-radius:16px;padding:20px 12px;text-align:center;transition:border-color .2s,transform .2s" class="cat-link">
+          <div style="font-size:32px;margin-bottom:8px">{{ cat.icon }}</div>
+          <div style="font-size:12px;font-weight:600">{{ cat.name }}</div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Featured -->
+  {% if featured %}
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <h2 class="section-title">Featured Products</h2>
+      <a href="{% url 'store:shop' %}" style="font-size:13px;color:var(--tx3)">See all →</a>
+    </div>
+    <div class="row g-3">{% for p in featured %}{% include 'store/partials/product_card.html' %}{% endfor %}</div>
+  </div>
+  {% endif %}
+
+  <!-- New Arrivals -->
+  {% if new_arrivals %}
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <h2 class="section-title">New Arrivals ✨</h2>
+      <a href="{% url 'store:shop' %}?badge=new" style="font-size:13px;color:var(--tx3)">See all →</a>
+    </div>
+    <div class="row g-3">{% for p in new_arrivals %}{% include 'store/partials/product_card.html' %}{% endfor %}</div>
+  </div>
+  {% endif %}
+
+  <!-- USP -->
+  <div class="row g-3 mb-2">
+    <div class="col-6 col-md-3"><div class="mv-card p-3 text-center"><div style="font-size:28px;margin-bottom:8px">🚚</div><div style="font-size:13px;font-weight:700">Free Delivery</div><div style="font-size:11px;color:var(--tx3)">Orders above ₹999</div></div></div>
+    <div class="col-6 col-md-3"><div class="mv-card p-3 text-center"><div style="font-size:28px;margin-bottom:8px">🔄</div><div style="font-size:13px;font-weight:700">Easy Returns</div><div style="font-size:11px;color:var(--tx3)">30-day hassle-free</div></div></div>
+    <div class="col-6 col-md-3"><div class="mv-card p-3 text-center"><div style="font-size:28px;margin-bottom:8px">🏷️</div><div style="font-size:13px;font-weight:700">Best Offers</div><div style="font-size:11px;color:var(--tx3)">Coupons & deals daily</div></div></div>
+    <div class="col-6 col-md-3"><div class="mv-card p-3 text-center"><div style="font-size:28px;margin-bottom:8px">⭐</div><div style="font-size:13px;font-weight:700">Loyalty Points</div><div style="font-size:11px;color:var(--tx3)">Earn & redeem rewards</div></div></div>
+  </div>
+</div>
+<style>.cat-link:hover{border-color:var(--acc)!important;transform:translateY(-4px)!important}</style>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}{% block title %}Your Bag — ManVault{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="section-title mb-4">Your Bag 🛒</h1>
+  {% if cart.items.exists %}
+  <div class="row g-4">
+    <div class="col-lg-8">
+      {% for item in cart.items.all %}
+      <div class="mv-card p-3 mb-3 d-flex gap-3 align-items-start">
+        <div style="width:80px;height:100px;flex-shrink:0;background:var(--bg3);border-radius:10px;overflow:hidden">
+          {% if item.product.main_image %}<img src="{{ item.product.main_image.image.url }}" style="width:100%;height:100%;object-fit:cover">
+          {% else %}<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px">👔</div>{% endif %}
+        </div>
+        <div class="flex-grow-1">
+          <a href="{% url 'store:product_detail' item.product.slug %}" style="font-weight:700;font-size:14px">{{ item.product.name }}</a>
+          {% if item.variant %}<div style="font-size:12px;color:var(--tx3);margin-top:2px">{{ item.variant.size }}{% if item.variant.color %} / {{ item.variant.color }}{% endif %}</div>{% endif %}
+          <div style="font-size:16px;font-weight:800;color:var(--acc);margin-top:8px">₹{{ item.product.price }}</div>
+          {% if item.product.original_price %}<div style="font-size:11px;color:var(--tx3)">MRP: <s>₹{{ item.product.original_price }}</s> ({{ item.product.discount_percent }}% off)</div>{% endif %}
+        </div>
+        <div class="d-flex flex-column align-items-end gap-2">
+          <form method="POST" action="{% url 'store:update_cart' item.id %}" class="d-flex gap-1 align-items-center">
+            {% csrf_token %}
+            <button name="quantity" value="{{ item.quantity|add:'-1' }}" class="icon-btn" style="width:30px;height:30px;font-size:14px;font-weight:800">−</button>
+            <span style="width:28px;text-align:center;font-weight:700;font-size:14px">{{ item.quantity }}</span>
+            <button name="quantity" value="{{ item.quantity|add:'1' }}" class="icon-btn" style="width:30px;height:30px;font-size:14px;font-weight:800">+</button>
+          </form>
+          <div style="font-weight:800;font-size:15px">₹{{ item.subtotal }}</div>
+          <a href="{% url 'store:remove_from_cart' item.id %}" style="font-size:12px;color:#FF3366" onclick="return confirm('Remove item?')"><i class="bi bi-trash"></i> Remove</a>
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Coupon Section -->
+      <div class="mv-card p-4 mt-3">
+        <h6 style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:14px">🏷️ Have a Coupon Code?</h6>
+        {% if coupon %}
+        <div style="background:rgba(200,255,0,.08);border:1px dashed rgba(200,255,0,.4);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:14px;font-weight:800;color:var(--acc)">{{ coupon.code }} ✅</div>
+            <div style="font-size:12px;color:var(--tx3)">You save ₹{{ coupon_discount|floatformat:0 }}</div>
+          </div>
+          <a href="{% url 'store:remove_coupon' %}" style="font-size:12px;color:#FF3366"><i class="bi bi-x-lg"></i> Remove</a>
+        </div>
+        {% else %}
+        <form method="POST" action="{% url 'store:apply_coupon' %}" class="d-flex gap-2">
+          {% csrf_token %}
+          <input type="text" name="code" placeholder="Enter coupon code (e.g. WELCOME10)" class="mv-input flex-grow-1" style="text-transform:uppercase">
+          <button type="submit" class="mv-btn" style="white-space:nowrap;padding:12px 18px">Apply</button>
+        </form>
+        <div style="margin-top:10px">
+          <a href="{% url 'store:offers' %}" style="font-size:12px;color:var(--acc)"><i class="bi bi-tag"></i> View all available coupons</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="col-lg-4">
+      <div class="mv-card p-4" style="position:sticky;top:80px">
+        <h5 style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:16px">Price Details</h5>
+        <div class="d-flex justify-content-between mb-2" style="font-size:14px"><span style="color:var(--tx2)">Price ({{ cart.item_count }} items)</span><span>₹{{ cart.total }}</span></div>
+        <div class="d-flex justify-content-between mb-2" style="font-size:14px"><span style="color:var(--tx2)">Delivery</span><span style="color:var(--acc)">{% if shipping == 0 %}FREE{% else %}₹{{ shipping }}{% endif %}</span></div>
+        {% if coupon_discount > 0 %}
+        <div class="d-flex justify-content-between mb-2" style="font-size:14px;color:var(--acc)"><span>Coupon Discount</span><span>-₹{{ coupon_discount|floatformat:0 }}</span></div>
+        {% endif %}
+        <hr style="border-color:var(--brd);margin:12px 0">
+        <div class="d-flex justify-content-between mb-1" style="font-size:18px;font-weight:800"><span>Total Amount</span><span>₹{{ total|floatformat:0 }}</span></div>
+        {% if coupon_discount > 0 %}<div style="font-size:12px;color:var(--acc);margin-bottom:12px">🎉 You're saving ₹{{ coupon_discount|floatformat:0 }} on this order!</div>{% endif %}
+        <a href="{% url 'orders:checkout' %}" class="mv-btn w-100 justify-content-center" style="padding:14px;margin-top:12px">Proceed to Checkout →</a>
+        <a href="{% url 'store:shop' %}" class="mv-btn-outline w-100 justify-content-center mt-2" style="padding:12px">Continue Shopping</a>
+        <div style="display:flex;justify-content:center;gap:12px;margin-top:16px;font-size:10px;color:var(--tx3)">
+          <span>🔒 Secure Checkout</span><span>|</span><span>📦 Easy Returns</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:80px 0">
+    <div style="font-size:80px;margin-bottom:20px">🛒</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:32px;margin-bottom:8px">Your bag is empty</h2>
+    <p style="color:var(--tx3);margin-bottom:24px">Time to fill it up with premium picks!</p>
+    <a href="{% url 'store:shop' %}" class="mv-btn">Start Shopping</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'dashboard/base.html' %}{% block title %}Analytics{% endblock %}{% block page_title %}Analytics{% endblock %}
+{% block extra_head %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+  <div class="col-12"><div class="stat-card"><div style="font-size:13px;font-weight:700;margin-bottom:16px">Monthly Revenue (12 Months)</div><canvas id="monthChart" height="80"></canvas></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-6"><div class="stat-card"><div style="font-size:13px;font-weight:700;margin-bottom:16px">Top Products by Sales</div>
+    {% for p in top_products %}<div class="d-flex justify-content-between align-items-center mb-3">
+      <div style="font-size:13px;color:var(--tx2)">{{ forloop.counter }}. {{ p.name }}</div>
+      <div style="font-weight:700;color:var(--acc)">{{ p.sales_count }} sold</div>
+    </div>{% endfor %}
+  </div></div>
+  <div class="col-lg-6"><div class="stat-card"><div style="font-size:13px;font-weight:700;margin-bottom:16px">Order Status Distribution</div>
+    {% for s in status_dist %}<div class="d-flex justify-content-between mb-3">
+      <span style="font-size:13px;color:var(--tx2)">{{ s.status|title }}</span>
+      <span style="font-weight:700">{{ s.c }}</span>
+    </div>{% endfor %}
+  </div></div>
+</div>
+{% endblock %}
+{% block extra_js %}<script>
+const mData = {{ months|safe }};
+new Chart(document.getElementById('monthChart'),{type:'bar',data:{labels:mData.map(m=>m.label),datasets:[{label:'Revenue',data:mData.map(m=>m.value),backgroundColor:'rgba(200,255,0,.7)',borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#555'},grid:{display:false}},y:{ticks:{color:'#555'},grid:{color:'#1A1A1A'}}}}});
+</script>{% endblock %}

@@ -1,0 +1,28 @@
+<div class="col-6 col-md-4 col-lg-3">
+  <div class="product-card">
+    <div class="product-img-wrap">
+      <a href="{% url 'store:product_detail' p.slug %}">
+        {% if p.main_image %}<img src="{{ p.main_image.image.url }}" alt="{{ p.name }}" loading="lazy">
+        {% else %}<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;background:var(--bg3)">👔</div>{% endif %}
+      </a>
+      <div class="product-badges">
+        {% if p.badge %}<span class="badge-{{ p.badge }}">{{ p.badge|upper }}</span>{% endif %}
+        {% if p.discount_percent %}<span class="badge-sale">-{{ p.discount_percent }}%</span>{% endif %}
+      </div>
+      <button class="wish-btn ajax-wish" data-pid="{{ p.id }}" title="Wishlist">❤️</button>
+    </div>
+    <div class="product-info">
+      <div class="product-name"><a href="{% url 'store:product_detail' p.slug %}" style="color:var(--tx)">{{ p.name }}</a></div>
+      <div class="product-meta">{% if p.category %}{{ p.category.name }}{% endif %}{% if p.rating %} · ⭐{{ p.rating }}{% endif %}</div>
+      <div class="product-price">
+        <span class="price-cur">₹{{ p.price }}</span>
+        {% if p.original_price %}<span class="price-orig">₹{{ p.original_price }}</span><span class="price-disc">{{ p.discount_percent }}% OFF</span>{% endif %}
+      </div>
+      {% if p.stock == 0 %}
+        <button class="add-btn" disabled style="opacity:.5">Out of Stock</button>
+      {% else %}
+        <button class="add-btn ajax-add-cart" data-pid="{{ p.id }}">Add to Bag</button>
+      {% endif %}
+    </div>
+  </div>
+</div>

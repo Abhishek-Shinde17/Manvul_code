@@ -1,0 +1,75 @@
+{% extends 'base.html' %}{% block title %}Checkout — ManVault{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="section-title mb-4">Checkout</h1>
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <form method="POST" action="{% url 'orders:place_order' %}">
+        {% csrf_token %}
+        <div class="mv-card p-4 mb-4">
+          <h5 style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:20px">📍 Delivery Address</h5>
+          {% if addresses %}{% for addr in addresses %}
+          <label style="display:block;background:var(--bg3);border:2px solid {% if forloop.first %}var(--acc){% else %}var(--brd){% endif %};border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer" id="al-{{ addr.id }}">
+            <input type="radio" name="address_id" value="{{ addr.id }}" {% if forloop.first %}checked{% endif %} onchange="selectAddr({{ addr.id }})" style="margin-right:8px">
+            <strong>{{ addr.full_name }}</strong><span style="background:var(--acc);color:var(--acctx);font-size:9px;font-weight:800;padding:2px 8px;border-radius:4px;margin-left:8px">{{ addr.label|upper }}</span>
+            <div style="font-size:13px;color:var(--tx2);margin-top:6px">{{ addr.line1 }}, {{ addr.city }}, {{ addr.state }} — {{ addr.pincode }}</div>
+            <div style="font-size:12px;color:var(--tx3)">📞 {{ addr.phone }}</div>
+          </label>
+          {% endfor %}<a href="{% url 'accounts:add_address' %}" style="font-size:13px;color:var(--acc)">+ Add new address</a>
+          {% else %}
+          <div class="row g-3">
+            <div class="col-md-6"><input type="text" name="full_name" placeholder="Full Name *" class="mv-input" required></div>
+            <div class="col-md-6"><input type="text" name="phone" placeholder="Phone *" class="mv-input" required></div>
+            <div class="col-12"><input type="text" name="address" placeholder="Street Address *" class="mv-input" required></div>
+            <div class="col-md-4"><input type="text" name="city" placeholder="City *" class="mv-input" required></div>
+            <div class="col-md-4"><input type="text" name="state" placeholder="State *" class="mv-input" required></div>
+            <div class="col-md-4"><input type="text" name="pincode" placeholder="Pincode *" class="mv-input" required></div>
+          </div>{% endif %}
+        </div>
+        {% if loyalty_pts > 0 %}
+        <div class="mv-card p-4 mb-4">
+          <h5 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:12px">⭐ Loyalty Points</h5>
+          <div style="background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.2);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:700">You have <span style="color:var(--acc)">{{ loyalty_pts }} points</span></div><div style="font-size:12px;color:var(--tx3)">Max discount: ₹{{ max_loyalty_discount|floatformat:0 }}</div></div>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:8px"><input type="checkbox" name="use_loyalty" style="accent-color:var(--acc);width:18px;height:18px"><span style="font-weight:700;font-size:13px">Use Points</span></label>
+          </div>
+        </div>
+        {% endif %}
+        <div class="mv-card p-4 mb-4">
+          <h5 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:16px">💳 Payment Method</h5>
+          <label style="display:flex;align-items:center;gap:12px;background:var(--bg3);border:2px solid var(--acc);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer">
+            <input type="radio" name="payment_method" value="cod" checked style="accent-color:var(--acc)">
+            <div><div style="font-weight:700">💵 Cash on Delivery</div><div style="font-size:12px;color:var(--tx3)">Pay when you receive</div></div>
+          </label>
+          <label style="display:flex;align-items:center;gap:12px;background:var(--bg3);border:2px solid var(--brd);border-radius:12px;padding:16px;cursor:pointer">
+            <input type="radio" name="payment_method" value="online" style="accent-color:var(--acc)">
+            <div><div style="font-weight:700">💳 Online (UPI / Cards)</div><div style="font-size:12px;color:var(--tx3)">Instant payment</div></div>
+          </label>
+          <div style="background:rgba(200,255,0,.06);border:1px solid rgba(200,255,0,.15);border-radius:10px;padding:12px;margin-top:12px;font-size:12px;color:var(--tx3)">🔐 Delivery OTP will be sent to your email for confirmation.</div>
+        </div>
+        <button type="submit" class="mv-btn w-100 justify-content-center" style="padding:16px;font-size:15px">Place Order Securely 🔒</button>
+      </form>
+    </div>
+    <div class="col-lg-5">
+      <div class="mv-card p-4" style="position:sticky;top:80px">
+        <h5 style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:16px">Order Summary</h5>
+        {% for item in cart.items.all %}
+        <div class="d-flex gap-3 mb-3 pb-3" style="border-bottom:1px solid var(--brd)">
+          <div style="width:52px;height:64px;flex-shrink:0;background:var(--bg3);border-radius:8px;overflow:hidden">{% if item.product.main_image %}<img src="{{ item.product.main_image.image.url }}" style="width:100%;height:100%;object-fit:cover">{% else %}<div style="display:flex;height:100%;align-items:center;justify-content:center">👔</div>{% endif %}</div>
+          <div class="flex-grow-1"><div style="font-size:13px;font-weight:600">{{ item.product.name }}</div>{% if item.variant %}<div style="font-size:11px;color:var(--tx3)">{{ item.variant.size }}</div>{% endif %}<div style="font-size:11px;color:var(--tx3)">Qty: {{ item.quantity }}</div></div>
+          <div style="font-weight:800">₹{{ item.subtotal }}</div>
+        </div>
+        {% endfor %}
+        <div class="d-flex justify-content-between mb-2" style="font-size:13px"><span style="color:var(--tx2)">Subtotal</span><span>₹{{ subtotal }}</span></div>
+        <div class="d-flex justify-content-between mb-2" style="font-size:13px"><span style="color:var(--tx2)">Delivery</span><span style="color:var(--acc)">{% if shipping == 0 %}FREE{% else %}₹{{ shipping }}{% endif %}</span></div>
+        <div class="d-flex justify-content-between mb-2" style="font-size:13px"><span style="color:var(--tx2)">GST (18%)</span><span>₹{{ tax }}</span></div>
+        {% if coupon_discount %}<div class="d-flex justify-content-between mb-2" style="font-size:13px;color:var(--acc)"><span>Coupon ({{ coupon.code }})</span><span>-₹{{ coupon_discount|floatformat:0 }}</span></div>{% endif %}
+        <hr style="border-color:var(--brd)">
+        <div class="d-flex justify-content-between" style="font-size:20px;font-weight:800"><span>Total</span><span>₹{{ total|floatformat:0 }}</span></div>
+        {% if coupon_discount %}<div style="color:var(--acc);font-size:12px;margin-top:6px">🎉 Saving ₹{{ coupon_discount|floatformat:0 }}!</div>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<script>function selectAddr(id){document.querySelectorAll('[id^=al-]').forEach(el=>el.style.borderColor='var(--brd)');document.getElementById('al-'+id).style.borderColor='var(--acc)';}</script>
+{% endblock %}

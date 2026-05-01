@@ -1,0 +1,24 @@
+{% extends 'dashboard/base.html' %}{% block title %}Categories{% endblock %}{% block page_title %}Categories{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-4"><a href="{% url 'dashboard:category_new' %}" class="mv-btn"><i class="bi bi-plus-lg"></i> Add Category</a></div>
+<div class="stat-card">
+  <table class="mv-table">
+    <thead><tr><th>Category</th><th>Slug</th><th>Icon</th><th>Products</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for cat in categories %}
+      <tr>
+        <td style="font-weight:600;color:var(--tx)">{{ cat.name }}</td>
+        <td style="font-size:12px;color:var(--tx3)">{{ cat.slug }}</td>
+        <td style="font-size:22px">{{ cat.icon }}</td>
+        <td>{{ cat.product_count }}</td>
+        <td><span style="font-size:11px;color:{% if cat.is_active %}var(--acc){% else %}#FF3366{% endif %}">{% if cat.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+        <td class="d-flex gap-2">
+          <a href="{% url 'dashboard:category_edit' cat.id %}" class="mv-btn-outline" style="padding:6px 12px;font-size:11px"><i class="bi bi-pencil"></i></a>
+          <a href="{% url 'dashboard:category_delete' cat.id %}" class="mv-btn-danger" style="padding:6px 12px;font-size:11px"><i class="bi bi-trash"></i></a>
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--tx3)">No categories</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

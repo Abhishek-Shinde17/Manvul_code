@@ -1,0 +1,35 @@
+{% extends 'dashboard/base.html' %}{% block title %}{{ customer.get_full_name }}{% endblock %}{% block page_title %}Customer: {{ customer.get_full_name|default:customer.username }}{% endblock %}
+{% block content %}
+<a href="{% url 'dashboard:customers' %}" style="font-size:13px;color:var(--tx3);display:inline-flex;gap:6px;margin-bottom:20px">← Customers</a>
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="stat-card p-4 text-center mb-3">
+      <div style="width:72px;height:72px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--acctx);margin:0 auto 14px">{{ customer.first_name|first|upper|default:"?" }}</div>
+      <div style="font-size:18px;font-weight:700">{{ customer.get_full_name|default:customer.username }}</div>
+      <div style="font-size:13px;color:var(--tx3)">{{ customer.email }}</div>
+      {% if customer.phone %}<div style="font-size:13px;color:var(--tx3)">{{ customer.phone }}</div>{% endif %}
+      <div style="margin-top:16px;display:flex;justify-content:space-around">
+        <div><div style="font-size:20px;font-weight:800;color:var(--acc)">{{ orders.count }}</div><div style="font-size:10px;color:var(--tx3)">ORDERS</div></div>
+        <div><div style="font-size:20px;font-weight:800;color:#A855F7">{{ customer.loyalty_points }}</div><div style="font-size:10px;color:var(--tx3)">POINTS</div></div>
+        <div><div style="font-size:20px;font-weight:800">₹{{ total_spent|floatformat:0 }}</div><div style="font-size:10px;color:var(--tx3)">SPENT</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="stat-card p-4">
+      <div style="font-size:13px;font-weight:700;margin-bottom:16px">Order History</div>
+      <table class="mv-table">
+        <thead><tr><th>Order</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for order in orders %}
+          <tr><td><a href="{% url 'dashboard:order_detail' order.order_number %}" style="color:var(--acc);font-weight:700">#{{ order.order_number }}</a></td>
+          <td>{{ order.items.count }}</td><td style="font-weight:700">₹{{ order.total }}</td>
+          <td><span class="badge-status s-{{ order.status }}">{{ order.get_status_display }}</span></td>
+          <td style="font-size:12px">{{ order.created_at|date:"d M Y" }}</td></tr>
+          {% empty %}<tr><td colspan="5" style="color:var(--tx3);text-align:center;padding:30px">No orders yet</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

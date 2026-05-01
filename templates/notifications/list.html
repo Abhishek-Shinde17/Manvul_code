@@ -1,0 +1,24 @@
+{% extends 'base.html' %}{% block title %}Notifications — ManVault{% endblock %}
+{% block content %}<div class="container py-4" style="max-width:700px">
+  <h1 class="section-title mb-4">🔔 Notifications</h1>
+  {% if notifications %}
+  {% for n in notifications %}
+  <div class="mv-card p-4 mb-3" style="{% if not n.is_read %}border-color:rgba(200,255,0,.3){% endif %}">
+    <div class="d-flex gap-3 align-items-start">
+      <div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:{% if n.notif_type == 'order' %}rgba(200,255,0,.1){% elif n.notif_type == 'offer' %}rgba(255,107,53,.1){% elif n.notif_type == 'delivery' %}rgba(0,195,255,.1){% else %}var(--bg3){% endif %}">
+        {% if n.notif_type == 'order' %}📦{% elif n.notif_type == 'offer' %}🏷️{% elif n.notif_type == 'delivery' %}🚚{% elif n.notif_type == 'otp' %}🔐{% else %}ℹ️{% endif %}
+      </div>
+      <div class="flex-grow-1">
+        <div style="font-weight:{% if not n.is_read %}700{% else %}600{% endif %};font-size:14px;margin-bottom:4px">{{ n.title }}</div>
+        <div style="font-size:13px;color:var(--tx2);line-height:1.5">{{ n.message }}</div>
+        <div style="font-size:11px;color:var(--tx3);margin-top:6px">{{ n.created_at|timesince }} ago</div>
+      </div>
+      {% if not n.is_read %}<div style="width:8px;height:8px;background:var(--acc);border-radius:50%;flex-shrink:0;margin-top:6px"></div>{% endif %}
+    </div>
+    {% if n.link %}<a href="{{ n.link }}" style="font-size:12px;color:var(--acc);margin-top:8px;display:inline-block">View details →</a>{% endif %}
+  </div>
+  {% endfor %}
+  {% else %}
+  <div style="text-align:center;padding:80px 0"><div style="font-size:64px;margin-bottom:16px">🔔</div><h3 style="font-family:'Cormorant Garamond',serif;font-size:28px">No notifications yet</h3><p style="color:var(--tx3);margin-top:8px">We'll notify you about orders, offers and more.</p></div>
+  {% endif %}
+</div>{% endblock %}

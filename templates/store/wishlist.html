@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% block title %}My Wishlist — ManVault{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="section-title mb-4">My Wishlist ❤️</h1>
+  {% if wishlist.products.exists %}
+  <div class="row g-3">
+    {% for p in wishlist.products.all %}{% include 'store/partials/product_card.html' %}{% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:80px 0">
+    <div style="font-size:72px;margin-bottom:16px">🤍</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:30px;margin-bottom:8px">Your wishlist is empty</h2>
+    <p style="color:var(--tx3);margin-bottom:24px">Save items you love for later!</p>
+    <a href="{% url 'store:shop' %}" class="mv-btn">Browse Products</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

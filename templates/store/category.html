@@ -1,0 +1,12 @@
+{% extends 'base.html' %}{% block title %}{{ category.name }} — ManVault{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="mv-bc mb-3"><a href="{% url 'store:home' %}">Home</a> / {{ category.name }}</div>
+  <h1 class="section-title mb-4">{{ category.icon }} {{ category.name }}</h1>
+  {% if category.description %}<p style="color:var(--tx2);margin-bottom:24px">{{ category.description }}</p>{% endif %}
+  <div class="row g-3">
+    {% for p in products %}{% include 'store/partials/product_card.html' %}{% endfor %}
+    {% empty %}<div style="text-align:center;padding:60px;color:var(--tx3)">No products in this category yet.</div>{% endfor %}
+  </div>
+</div>
+{% endblock %}

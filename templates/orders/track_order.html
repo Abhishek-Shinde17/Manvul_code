@@ -1,0 +1,74 @@
+{% extends 'base.html' %}{% block title %}Track Order {{ order.order_number }} — ManVault{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:760px">
+  <a href="{% url 'orders:order_list' %}" style="color:var(--tx3);font-size:13px;display:inline-flex;align-items:center;gap:6px;margin-bottom:20px">← My Orders</a>
+  <div class="mv-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <div><div style="font-size:11px;color:var(--tx3)">ORDER</div><div style="font-size:24px;font-weight:800;color:var(--acc)">#{{ order.order_number }}</div></div>
+      <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+    </div>
+    {% if order.tracking_number %}
+    <div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:20px">
+      <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">TRACKING NUMBER</div>
+      <div style="font-weight:700;color:var(--acc)">{{ order.tracking_number }}</div>
+      {% if order.courier_name %}<div style="font-size:12px;color:var(--tx3)">via {{ order.courier_name }}</div>{% endif %}
+    </div>
+    {% endif %}
+    <!-- Progress Steps -->
+    <div style="position:relative;padding:20px 0">
+      <div style="position:absolute;top:34px;left:calc(10% + 14px);right:calc(10% + 14px);height:2px;background:var(--brd)"></div>
+      <div style="position:absolute;top:34px;left:calc(10% + 14px);height:2px;background:var(--acc);width:{{ order.status_percent }}%;transition:width .6s"></div>
+      <div class="d-flex justify-content-between" style="position:relative">
+        {% for step in steps %}
+        <div style="text-align:center;flex:1">
+          <div style="width:28px;height:28px;border-radius:50%;background:{% if step.done %}var(--acc){% else %}var(--bg3){% endif %};border:2px solid {% if step.done %}var(--acc){% else %}var(--brd2){% endif %};display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;transition:all .3s">
+            {% if step.done %}✓{% else %}{{ step.icon }}{% endif %}
+          </div>
+          <div style="font-size:10px;color:{% if step.done %}var(--acc){% else %}var(--tx3){% endif %};font-weight:{% if step.done %}700{% else %}400{% endif %}">{{ step.label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% if order.estimated_delivery %}
+    <div style="text-align:center;margin-top:16px;padding:12px;background:rgba(200,255,0,.06);border-radius:10px">
+      <span style="font-size:13px;color:var(--tx2)">Estimated delivery: </span>
+      <span style="font-weight:700;color:var(--acc)">{{ order.estimated_delivery|date:"l, d M Y" }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Delivery OTP Verification -->
+  {% if order.status == 'out_for_delivery' and not order.delivery_otp_verified %}
+  <div class="mv-card p-4 mb-4" style="border-color:rgba(200,255,0,.4)">
+    <h5 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:12px">📱 Confirm Delivery via OTP</h5>
+    <p style="font-size:13px;color:var(--tx2);margin-bottom:16px">Your order is out for delivery! Enter the 6-digit OTP sent to your email to confirm receipt.</p>
+    <form method="POST" action="{% url 'orders:verify_delivery' order.id %}">
+      {% csrf_token %}
+      <div class="d-flex gap-2">
+        <input type="text" name="otp" maxlength="6" placeholder="Enter 6-digit OTP" class="mv-input" style="letter-spacing:8px;font-size:18px;font-weight:800;text-align:center;max-width:240px">
+        <button type="submit" class="mv-btn">Confirm Delivery ✅</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+
+  <!-- Activity Log -->
+  <div class="mv-card p-4">
+    <h5 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:20px">📋 Tracking History</h5>
+    {% for log in logs %}
+    <div style="display:flex;gap:16px;margin-bottom:20px">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="width:10px;height:10px;background:var(--acc);border-radius:50%;flex-shrink:0;margin-top:3px"></div>
+        {% if not forloop.last %}<div style="width:2px;flex:1;background:var(--brd);margin-top:4px"></div>{% endif %}
+      </div>
+      <div style="padding-bottom:{% if not forloop.last %}20px{% else %}0{% endif %}">
+        <div style="font-weight:700;font-size:14px">{{ log.status|title }}</div>
+        {% if log.note %}<div style="font-size:13px;color:var(--tx2);margin-top:2px">{{ log.note }}</div>{% endif %}
+        {% if log.location %}<div style="font-size:12px;color:var(--tx3);margin-top:2px"><i class="bi bi-geo-alt"></i> {{ log.location }}</div>{% endif %}
+        <div style="font-size:11px;color:var(--tx4);margin-top:4px">{{ log.created_at|date:"d M Y, g:i A" }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

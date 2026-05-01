@@ -1,0 +1,12 @@
+{% extends 'dashboard/base.html' %}{% block title %}Delete Product{% endblock %}
+{% block content %}<div style="max-width:500px">
+<div class="stat-card p-5 text-center">
+  <div style="font-size:48px;margin-bottom:16px">🗑️</div>
+  <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Delete Product?</h2>
+  <p style="color:var(--tx3);margin-bottom:24px">Are you sure you want to delete <strong style="color:var(--tx)">{{ product.name }}</strong>? This cannot be undone.</p>
+  <form method="POST" class="d-flex gap-3 justify-content-center">{% csrf_token %}
+    <button type="submit" class="mv-btn-danger">Delete</button>
+    <a href="{% url 'dashboard:products' %}" class="mv-btn-outline">Cancel</a>
+  </form>
+</div>
+</div>{% endblock %}

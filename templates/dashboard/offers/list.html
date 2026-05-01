@@ -1,0 +1,25 @@
+{% extends 'dashboard/base.html' %}{% block title %}Special Offers{% endblock %}{% block page_title %}Special Offers{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-4"><a href="{% url 'dashboard:offer_new' %}" class="mv-btn"><i class="bi bi-plus-lg"></i> New Offer</a></div>
+<div class="stat-card">
+  <table class="mv-table">
+    <thead><tr><th>Name</th><th>Type</th><th>Discount</th><th>Valid From</th><th>Valid Till</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for o in offers %}
+      <tr>
+        <td style="font-weight:600;color:var(--tx)">{{ o.name }}</td>
+        <td>{{ o.get_offer_type_display }}</td>
+        <td>{% if o.discount_percent %}{{ o.discount_percent }}%{% endif %} {% if o.discount_flat %}₹{{ o.discount_flat }}{% endif %}</td>
+        <td style="font-size:12px">{{ o.valid_from|date:"d M Y" }}</td>
+        <td style="font-size:12px">{{ o.valid_to|date:"d M Y" }}</td>
+        <td><span style="font-size:11px;color:{% if o.is_live %}var(--acc){% else %}#FF3366{% endif %}">{% if o.is_live %}🟢 Live{% else %}⏸ Inactive{% endif %}</span></td>
+        <td class="d-flex gap-2">
+          <a href="{% url 'dashboard:offer_edit' o.id %}" class="mv-btn-outline" style="padding:6px 12px;font-size:11px"><i class="bi bi-pencil"></i></a>
+          <a href="{% url 'dashboard:offer_delete' o.id %}" class="mv-btn-danger" style="padding:6px 12px;font-size:11px" onclick="return confirm('Delete?')"><i class="bi bi-trash"></i></a>
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--tx3)">No offers yet</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

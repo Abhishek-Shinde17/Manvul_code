@@ -1,0 +1,8 @@
+Django>=4.2,<5.0
+Pillow>=10.0
+django-crispy-forms>=2.0
+crispy-bootstrap5>=0.7
+django-allauth>=0.57.0
+pyotp>=2.9.0
+reportlab>=4.0
+qrcode>=7.4

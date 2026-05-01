@@ -1,0 +1,76 @@
+{% extends 'base.html' %}{% block title %}Order #{{ order.order_number }} — ManVault{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <a href="{% url 'orders:order_list' %}" style="color:var(--tx3);font-size:13px;display:inline-flex;align-items:center;gap:6px;margin-bottom:20px">← My Orders</a>
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="mv-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+          <div><div style="font-size:11px;color:var(--tx3)">ORDER NUMBER</div><div style="font-size:22px;font-weight:800;color:var(--acc)">#{{ order.order_number }}</div><div style="font-size:12px;color:var(--tx3)">{{ order.created_at|date:"d M Y, g:i A" }}</div></div>
+          <div class="d-flex gap-2 flex-wrap">
+            <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+            <a href="{% url 'orders:track_order' order.order_number %}" class="mv-btn mv-btn-sm"><i class="bi bi-geo-alt"></i> Track</a>
+            <a href="{% url 'orders:download_invoice' order.order_number %}" class="mv-btn-outline mv-btn-sm"><i class="bi bi-file-earmark-pdf"></i> Invoice</a>
+          </div>
+        </div>
+        {% if order.status == 'out_for_delivery' and not order.delivery_otp_verified %}
+        <div style="background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.3);border-radius:12px;padding:16px;margin-bottom:20px">
+          <div style="font-weight:700;margin-bottom:8px;color:var(--acc)">📱 Delivery OTP Required</div>
+          <form method="POST" action="{% url 'orders:verify_delivery' order.id %}" class="d-flex gap-2">
+            {% csrf_token %}
+            <input type="text" name="otp" maxlength="6" placeholder="6-digit OTP" class="mv-input" style="max-width:180px;letter-spacing:4px;text-align:center;font-weight:800">
+            <button type="submit" class="mv-btn mv-btn-sm">Verify ✅</button>
+          </form>
+        </div>
+        {% endif %}
+        <h5 style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase">Items</h5>
+        {% for item in order.items.all %}
+        <div class="d-flex gap-3 align-items-center py-3" style="border-bottom:1px solid var(--brd)">
+          <div style="width:64px;height:80px;flex-shrink:0;background:var(--bg3);border-radius:10px;overflow:hidden">{% if item.product and item.product.main_image %}<img src="{{ item.product.main_image.image.url }}" style="width:100%;height:100%;object-fit:cover">{% else %}<div style="display:flex;height:100%;align-items:center;justify-content:center;font-size:24px">👔</div>{% endif %}</div>
+          <div class="flex-grow-1"><div style="font-weight:600;margin-bottom:4px">{{ item.product_name }}</div>{% if item.size %}<div style="font-size:12px;color:var(--tx3)">Size: {{ item.size }}</div>{% endif %}<div style="font-size:12px;color:var(--tx3)">Qty: {{ item.quantity }} × ₹{{ item.price }}</div></div>
+          <div style="font-weight:800;font-size:15px">₹{{ item.subtotal }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% if order.status == 'delivered' %}
+      <div class="mv-card p-4 mb-4">
+        <h5 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:12px">Return / Exchange</h5>
+        <p style="font-size:13px;color:var(--tx2);margin-bottom:16px">Not satisfied? You can request a return within 30 days of delivery.</p>
+        <form method="POST" action="{% url 'orders:return_request' order.id %}">
+          {% csrf_token %}
+          <textarea name="reason" placeholder="Reason for return..." class="mv-input" rows="3" style="margin-bottom:12px"></textarea>
+          <button type="submit" class="mv-btn-outline" style="border-color:#FFD600;color:#FFD600" onclick="return confirm('Request return for this order?')"><i class="bi bi-arrow-return-left"></i> Request Return</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    <div class="col-lg-4">
+      <div class="mv-card p-4 mb-3">
+        <h6 style="font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Shipping To</h6>
+        <div style="font-weight:600;margin-bottom:4px">{{ order.shipping_name }}</div>
+        <div style="font-size:13px;color:var(--tx2);line-height:1.6">{{ order.shipping_address }}, {{ order.shipping_city }}, {{ order.shipping_state }} — {{ order.shipping_pincode }}</div>
+        <div style="font-size:12px;color:var(--tx3);margin-top:6px">📞 {{ order.shipping_phone }}</div>
+      </div>
+      <div class="mv-card p-4 mb-3">
+        <h6 style="font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Bill Details</h6>
+        <div class="d-flex justify-content-between mb-2" style="font-size:13px"><span style="color:var(--tx2)">Subtotal</span><span>₹{{ order.subtotal }}</span></div>
+        <div class="d-flex justify-content-between mb-2" style="font-size:13px"><span style="color:var(--tx2)">Delivery</span><span>{% if order.shipping_charge == 0 %}FREE{% else %}₹{{ order.shipping_charge }}{% endif %}</span></div>
+        <div class="d-flex justify-content-between mb-2" style="font-size:13px"><span style="color:var(--tx2)">GST</span><span>₹{{ order.tax }}</span></div>
+        {% if order.coupon_discount %}<div class="d-flex justify-content-between mb-2" style="font-size:13px;color:var(--acc)"><span>Coupon Discount</span><span>-₹{{ order.coupon_discount }}</span></div>{% endif %}
+        {% if order.loyalty_discount %}<div class="d-flex justify-content-between mb-2" style="font-size:13px;color:#A855F7"><span>Loyalty Points</span><span>-₹{{ order.loyalty_discount }}</span></div>{% endif %}
+        <hr style="border-color:var(--brd)">
+        <div class="d-flex justify-content-between" style="font-size:17px;font-weight:800"><span>Total Paid</span><span>₹{{ order.total }}</span></div>
+        <div style="font-size:12px;color:var(--tx3);margin-top:8px">{{ order.get_payment_method_display }} · <span style="color:{% if order.payment_status == 'paid' %}var(--acc){% else %}#FFD600{% endif %}">{{ order.get_payment_status_display }}</span></div>
+        {% if order.loyalty_points_earned %}<div style="font-size:12px;color:#A855F7;margin-top:6px">⭐ +{{ order.loyalty_points_earned }} pts earned</div>{% endif %}
+      </div>
+      {% if order.status in "pending,confirmed,processing" %}
+      <form method="POST" action="{% url 'orders:cancel_order' order.id %}">
+        {% csrf_token %}
+        <textarea name="reason" placeholder="Reason for cancellation (optional)" class="mv-input mb-2" rows="2"></textarea>
+        <button type="submit" class="w-100 mv-btn-sm" style="background:rgba(255,51,102,.12);color:#FF3366;border:1px solid rgba(255,51,102,.3);border-radius:9px;padding:10px;font-weight:700;width:100%;cursor:pointer" onclick="return confirm('Cancel this order?')"><i class="bi bi-x-circle"></i> Cancel Order</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

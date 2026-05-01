@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>{% block title %}Admin{% endblock %} — ManVault Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+<style>
+/* ── Cherry Dashboard Theme ──────────────────────────────────────── */
+:root{
+  --acc:#E8004D; --acc2:#FF2D6B; --acctx:#fff;
+  --bg:#FFF8FA;  --bg2:#FFFFFF;  --bg3:#FFF0F4;
+  --brd:#FFADC8; --brd2:#FFCFDF;
+  --tx:#2D1A22;  --tx2:#7A4A5A;  --tx3:#C4929F;
+  --shadow:rgba(232,0,77,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--tx);display:flex;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* ── Sidebar ─────────────────────────────────────────────────────── */
+.sidebar{
+  width:240px;background:var(--bg2);border-right:1.5px solid var(--brd2);
+  display:flex;flex-direction:column;position:fixed;height:100vh;
+  overflow-y:auto;z-index:100;box-shadow:2px 0 16px var(--shadow);
+}
+.sidebar-logo{
+  padding:20px;border-bottom:1.5px solid var(--brd2);
+  display:flex;align-items:center;gap:10px;
+}
+.sidebar-logo .icon{
+  width:36px;height:36px;background:var(--acc);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;
+}
+.sidebar-logo span{font-size:16px;font-weight:800;color:var(--tx)}
+.sidebar-section{
+  padding:8px 12px;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--tx3);margin-top:12px;font-weight:700;
+}
+.sidebar a{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  margin:2px 8px;border-radius:10px;font-size:13px;color:var(--tx2);
+  transition:all .15s;font-weight:500;
+}
+.sidebar a:hover,.sidebar a.active{
+  background:var(--bg3);color:var(--acc);transform:translateX(2px);
+}
+.sidebar a.active{font-weight:700;border-left:3px solid var(--acc);padding-left:13px}
+.sidebar a i{font-size:15px;width:18px}
+
+/* ── Main ────────────────────────────────────────────────────────── */
+.main{margin-left:240px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── Top Bar ─────────────────────────────────────────────────────── */
+.top-bar{
+  background:var(--bg2);border-bottom:1.5px solid var(--brd2);
+  padding:14px 28px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;box-shadow:0 2px 12px var(--shadow);
+}
+.top-bar-title{font-size:15px;font-weight:800;color:var(--tx)}
+
+.content{padding:28px;flex:1}
+
+/* ── Form Elements ───────────────────────────────────────────────── */
+.mv-input{
+  background:var(--bg3)!important;border:1.5px solid var(--brd)!important;
+  border-radius:10px!important;padding:10px 14px!important;
+  color:var(--tx)!important;font-size:13px!important;
+  width:100%;outline:none;transition:all .2s!important;
+}
+.mv-input:focus{border-color:var(--acc)!important;box-shadow:0 0 0 3px rgba(232,0,77,.08)!important}
+.mv-input::placeholder{color:var(--tx3)!important}
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+.mv-btn{
+  background:var(--acc);color:#fff;border:none;border-radius:10px;
+  padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;
+  display:inline-flex;align-items:center;gap:6px;transition:all .18s;
+}
+.mv-btn:hover{background:var(--acc2);transform:translateY(-1px);box-shadow:0 4px 14px var(--shadow)}
+.mv-btn-outline{
+  background:transparent;color:var(--tx2);border:1.5px solid var(--brd);
+  border-radius:10px;padding:9px 18px;font-size:13px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:all .2s;
+}
+.mv-btn-outline:hover{border-color:var(--acc);color:var(--acc);background:var(--bg3)}
+.mv-btn-danger{
+  background:#FEF2F2;color:#DC2626;border:1.5px solid #FECACA;
+  border-radius:10px;padding:9px 18px;font-size:13px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:all .2s;
+}
+.mv-btn-danger:hover{background:#FEE2E2;border-color:#DC2626}
+
+/* ── Stat Card ───────────────────────────────────────────────────── */
+.stat-card{
+  background:var(--bg2);border:1.5px solid var(--brd2);border-radius:16px;padding:20px;
+  transition:box-shadow .2s;
+}
+.stat-card:hover{box-shadow:0 6px 20px var(--shadow)}
+.stat-val{font-size:28px;font-weight:800;margin:4px 0;color:var(--tx)}
+.stat-label{font-size:11px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+
+/* ── Table ───────────────────────────────────────────────────────── */
+.mv-table{width:100%;border-collapse:collapse;font-size:13px}
+.mv-table th{
+  padding:12px 16px;background:var(--bg3);color:var(--tx3);
+  font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  border-bottom:1.5px solid var(--brd2);text-align:left;font-weight:800;
+}
+.mv-table td{padding:14px 16px;border-bottom:1px solid var(--brd2);color:var(--tx2)}
+.mv-table tr:last-child td{border-bottom:none}
+.mv-table tr:hover td{background:var(--bg3)}
+
+/* ── Status Badges ───────────────────────────────────────────────── */
+.badge-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px}
+.s-confirmed{background:#FFF0F4;color:var(--acc)}
+.s-shipped,.s-packed{background:#EDE9FF;color:#7C3AED}
+.s-delivered{background:#ECFDF5;color:#059669}
+.s-cancelled{background:#FEF2F2;color:#DC2626}
+.s-processing,.s-out_for_delivery{background:#E0F2FE;color:#0284C7}
+.s-return_requested,.s-returned{background:#FEFCE8;color:#CA8A04}
+
+/* ── Alert Toasts ────────────────────────────────────────────────── */
+.mv-alerts{position:fixed;top:20px;right:20px;z-index:9999;width:320px}
+.mv-alert{
+  background:#fff;border-radius:12px;padding:14px 18px;margin-bottom:8px;
+  display:flex;align-items:center;gap:10px;font-size:13px;
+  box-shadow:0 4px 16px var(--shadow);border:1.5px solid var(--brd2);
+  animation:slideR .3s ease;
+}
+.mv-alert.success{border-color:var(--acc);color:var(--acc);background:#FFF0F4}
+.mv-alert.error{border-color:#DC2626;color:#DC2626;background:#FEF2F2}
+@keyframes slideR{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ── Sidebar ────────────────────────────────────────────────────────── -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="icon">👔</div>
+    <span>ManVault</span>
+  </div>
+  <div style="padding:12px 8px;flex:1">
+    <div class="sidebar-section">Overview</div>
+    <a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <a href="{% url 'dashboard:analytics' %}" class="{% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+      <i class="bi bi-bar-chart-line"></i> Analytics
+    </a>
+    <div class="sidebar-section">Catalogue</div>
+    <a href="{% url 'dashboard:products' %}" class="{% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-box-seam"></i> Products
+    </a>
+    <a href="{% url 'dashboard:categories' %}" class="{% if 'categor' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-grid"></i> Categories
+    </a>
+    <div class="sidebar-section">Sales</div>
+    <a href="{% url 'dashboard:orders' %}" class="{% if 'order' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-bag"></i> Orders
+    </a>
+    <a href="{% url 'dashboard:customers' %}" class="{% if 'customer' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-people"></i> Customers
+    </a>
+    <div class="sidebar-section">Promotions</div>
+    <a href="{% url 'dashboard:coupons' %}" class="{% if 'coupon' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-tag"></i> Coupons
+    </a>
+    <a href="{% url 'dashboard:offers' %}" class="{% if 'offer' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-lightning"></i> Special Offers
+    </a>
+    <div class="sidebar-section">Links</div>
+    <a href="{% url 'store:home' %}" target="_blank"><i class="bi bi-shop"></i> View Store</a>
+    <a href="/admin/"><i class="bi bi-gear"></i> Django Admin</a>
+  </div>
+</div>
+
+<!-- ── Main Content ───────────────────────────────────────────────────── -->
+<div class="main">
+  <div class="top-bar">
+    <div class="top-bar-title">{% block page_title %}Dashboard{% endblock %}</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-size:12px;color:var(--tx3)">{{ request.user.get_full_name|default:request.user.username }}</div>
+      <a href="{% url 'accounts:logout' %}"
+         style="font-size:12px;color:var(--tx3);border:1.5px solid var(--brd2);
+                border-radius:8px;padding:6px 12px;transition:all .2s"
+         onmouseover="this.style.borderColor='var(--acc)';this.style.color='var(--acc)'"
+         onmouseout="this.style.borderColor='var(--brd2)';this.style.color='var(--tx3)'">
+        Sign Out
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="mv-alerts">
+      {% for message in messages %}
+      <div class="mv-alert {{ message.tags }}">
+        {% if message.tags == 'success' %}✓{% else %}✕{% endif %} {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+setTimeout(()=>document.querySelectorAll('.mv-alert').forEach(el=>{
+  el.style.transition='opacity .4s';el.style.opacity='0';
+  setTimeout(()=>el.remove(),400);
+}),3500);
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

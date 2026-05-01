@@ -1,0 +1,28 @@
+{% extends 'dashboard/base.html' %}{% block title %}{% if product %}Edit Product{% else %}New Product{% endif %}{% endblock %}
+{% block page_title %}{% if product %}Edit: {{ product.name }}{% else %}Add New Product{% endif %}{% endblock %}
+{% block content %}
+<div style="max-width:760px">
+<a href="{% url 'dashboard:products' %}" style="font-size:13px;color:var(--tx3);display:inline-flex;align-items:center;gap:6px;margin-bottom:20px">← Products</a>
+<div class="stat-card p-4">
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row g-3">
+      {% for field in form %}
+      <div class="{% if field.name in 'description,material' %}col-12{% else %}col-md-6{% endif %}">
+        <label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div style="font-size:11px;color:var(--tx3);margin-top:4px">{{ field.help_text }}</div>{% endif %}
+        {% if field.errors %}<div style="color:#FF3366;font-size:11px;margin-top:4px">{{ field.errors.0 }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <div class="col-12"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Product Images</label>
+      <input type="file" name="images" multiple class="mv-input" accept="image/*"></div>
+    </div>
+    <div class="d-flex gap-3 mt-4">
+      <button type="submit" class="mv-btn">{% if product %}Save Changes{% else %}Create Product{% endif %}</button>
+      <a href="{% url 'dashboard:products' %}" class="mv-btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}

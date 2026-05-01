@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>{% block title %}ManVault — Premium Men's Fashion{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+<style>
+/* ── Cherry-Fresh Light Theme ─────────────────────────────────────────────── */
+:root{
+  --acc:#E8004D;          /* cherry red — primary action */
+  --acc2:#FF2D6B;         /* rose — hover state        */
+  --acctx:#FFFFFF;        /* white text on acc         */
+  --bg:#FFF8FA;           /* page background           */
+  --bg2:#FFFFFF;          /* navbar / cards            */
+  --bg3:#FFF0F4;          /* input fill / subtle bg    */
+  --brd:#FFADC8;          /* border colour             */
+  --brd2:#FFCFDF;         /* subtle border             */
+  --tx:#2D1A22;           /* primary text              */
+  --tx2:#7A4A5A;          /* secondary text            */
+  --tx3:#C4929F;          /* muted / placeholder       */
+  --card:#FFFFFF;         /* product card bg           */
+  --shadow:rgba(232,0,77,.10);
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+a{color:inherit;text-decoration:none}
+.mv-acc{color:var(--acc)}
+
+/* ── Buttons ────────────────────────────────────────────────────────────────── */
+.mv-btn{
+  background:var(--acc);color:var(--acctx);border:none;border-radius:12px;
+  padding:12px 24px;font-weight:800;cursor:pointer;font-family:'Syne',sans-serif;
+  transition:transform .15s,box-shadow .15s,background .15s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.mv-btn:hover{
+  background:var(--acc2);color:var(--acctx);
+  transform:translateY(-2px);box-shadow:0 8px 24px var(--shadow);
+}
+.mv-btn-outline{
+  background:transparent;color:var(--acc);border:1.5px solid var(--acc);
+  border-radius:12px;padding:11px 22px;font-weight:700;cursor:pointer;
+  font-family:'Syne',sans-serif;transition:all .2s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.mv-btn-outline:hover{background:var(--bg3);color:var(--acc)}
+.mv-btn-sm{padding:8px 14px;font-size:12px;border-radius:9px}
+
+/* ── Form Inputs ─────────────────────────────────────────────────────────────── */
+.mv-input{
+  background:var(--bg3)!important;border:1.5px solid var(--brd)!important;
+  border-radius:10px!important;padding:12px 16px!important;
+  color:var(--tx)!important;font-size:14px!important;
+  width:100%;outline:none;transition:all .2s!important;
+}
+.mv-input:focus{
+  border-color:var(--acc)!important;
+  box-shadow:0 0 0 3px rgba(232,0,77,.08)!important;
+}
+.mv-input::placeholder{color:var(--tx3)!important}
+
+/* ── Cards ───────────────────────────────────────────────────────────────────── */
+.mv-card{
+  background:var(--card);border:1.5px solid var(--brd2);
+  border-radius:16px;overflow:hidden;
+}
+
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(22px,3vw,36px);font-weight:700;line-height:1.1;color:var(--tx);
+}
+
+/* ── Ticker ──────────────────────────────────────────────────────────────────── */
+.ticker{
+  background:linear-gradient(90deg,var(--acc),var(--acc2),var(--acc));
+  color:#fff;padding:9px 0;overflow:hidden;white-space:nowrap;
+}
+.ticker-inner{display:inline-flex;animation:ticker 28s linear infinite}
+.ticker-item{padding:0 40px;font-size:11px;font-weight:800;letter-spacing:2px}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── Navbar ──────────────────────────────────────────────────────────────────── */
+.mv-navbar{
+  background:var(--bg2);border-bottom:1.5px solid var(--brd2);
+  padding:0;position:sticky;top:0;z-index:200;
+  box-shadow:0 2px 16px var(--shadow);
+}
+.mv-navbar .container-fluid{padding:12px 24px;display:flex;align-items:center;gap:16px}
+.mv-logo{
+  font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;
+  display:flex;align-items:center;gap:10px;color:var(--tx);
+}
+.mv-logo-icon{
+  width:36px;height:36px;background:var(--acc);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;
+}
+.nav-search{flex:1;max-width:460px;position:relative}
+.nav-search input{
+  background:var(--bg3);border:1.5px solid var(--brd);border-radius:50px;
+  padding:10px 16px 10px 42px;color:var(--tx);font-size:13px;
+  width:100%;outline:none;transition:border-color .2s;
+}
+.nav-search input:focus{border-color:var(--acc)}
+.nav-search input::placeholder{color:var(--tx3)}
+.nav-search .si{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  color:var(--tx3);font-size:14px;
+}
+.nav-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.icon-btn{
+  background:var(--bg3);border:1.5px solid var(--brd2);border-radius:10px;
+  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--tx2);font-size:16px;position:relative;
+  transition:all .18s;
+}
+.icon-btn:hover{border-color:var(--acc);color:var(--acc);background:var(--bg3);transform:translateY(-2px)}
+.icon-badge{
+  position:absolute;top:-6px;right:-6px;background:var(--acc);color:#fff;
+  font-size:9px;font-weight:800;width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.cart-btn{
+  background:var(--acc);color:#fff;border:none;border-radius:10px;
+  padding:10px 18px;font-weight:800;cursor:pointer;font-size:13px;
+  display:flex;align-items:center;gap:8px;transition:all .18s;
+}
+.cart-btn:hover{background:var(--acc2);transform:translateY(-2px);box-shadow:0 6px 18px var(--shadow)}
+
+/* ── Category Nav ────────────────────────────────────────────────────────────── */
+.cat-nav{
+  background:var(--bg2);border-bottom:1.5px solid var(--brd2);
+  padding:0 24px;display:flex;gap:4px;overflow-x:auto;
+}
+.cat-nav::-webkit-scrollbar{display:none}
+.cat-nav a{
+  padding:11px 16px;font-size:13px;color:var(--tx2);white-space:nowrap;
+  border-bottom:2.5px solid transparent;transition:color .2s,border-color .2s;
+  display:flex;align-items:center;gap:6px;font-weight:500;
+}
+.cat-nav a:hover,.cat-nav a.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* ── Product Card ────────────────────────────────────────────────────────────── */
+.product-card{
+  background:var(--card);border:1.5px solid var(--brd2);border-radius:16px;
+  overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s;height:100%;
+}
+.product-card:hover{
+  transform:translateY(-5px);border-color:var(--brd);
+  box-shadow:0 12px 32px var(--shadow);
+}
+.product-img-wrap{
+  position:relative;aspect-ratio:3/4;overflow:hidden;
+  background:linear-gradient(135deg,var(--bg3),#FFE4EE);
+}
+.product-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.product-card:hover .product-img-wrap img{transform:scale(1.05)}
+.product-badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:4px}
+.badge-new{background:var(--acc);color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:1.5px}
+.badge-hot{background:#FF6B35;color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:1.5px}
+.badge-sale{background:#DC2626;color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:1.5px}
+.badge-trending{background:#7C3AED;color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:1.5px}
+.wish-btn{
+  position:absolute;top:10px;right:10px;background:rgba(255,255,255,.85);
+  border:1.5px solid var(--brd2);border-radius:8px;width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:14px;transition:all .2s;backdrop-filter:blur(4px);
+}
+.wish-btn:hover,.wish-btn.active{background:#FFF0F4;border-color:var(--acc)}
+.product-info{padding:14px}
+.product-name{font-size:14px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx)}
+.product-meta{font-size:11px;color:var(--tx3);margin-bottom:8px}
+.product-price{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.price-cur{font-size:16px;font-weight:800;color:var(--tx)}
+.price-orig{font-size:12px;color:var(--tx3);text-decoration:line-through}
+.price-disc{font-size:11px;color:var(--acc);font-weight:700}
+.add-btn{
+  width:100%;margin-top:10px;background:var(--acc);color:#fff;border:none;
+  border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;
+  transition:all .18s;
+}
+.add-btn:hover{background:var(--acc2);transform:translateY(-1px)}
+.add-btn.in-cart{background:var(--bg3);color:var(--tx2);border:1.5px solid var(--brd)}
+
+/* ── Alerts ──────────────────────────────────────────────────────────────────── */
+.mv-alerts{
+  position:fixed;top:80px;left:50%;transform:translateX(-50%);
+  z-index:999;width:min(480px,90vw);pointer-events:none;
+}
+.mv-alert{
+  background:#fff;border-radius:12px;padding:14px 18px;margin-bottom:8px;
+  display:flex;align-items:center;gap:10px;font-size:13px;pointer-events:all;
+  border:1.5px solid var(--brd2);animation:slideIn .3s ease;
+  box-shadow:0 4px 16px var(--shadow);color:var(--tx);
+}
+.mv-alert.success{border-color:var(--acc);color:var(--acc);background:#FFF0F4}
+.mv-alert.error{border-color:#DC2626;color:#DC2626;background:#FEF2F2}
+@keyframes slideIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── Toast ───────────────────────────────────────────────────────────────────── */
+.mv-toast-cont{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.mv-toast{
+  background:#fff;border:1.5px solid var(--brd);border-radius:12px;
+  padding:14px 18px;color:var(--tx);font-size:13px;animation:slideRight .3s ease;
+  display:flex;align-items:center;gap:10px;max-width:300px;
+  box-shadow:0 8px 32px var(--shadow);
+}
+@keyframes slideRight{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── Breadcrumb ──────────────────────────────────────────────────────────────── */
+.mv-bc{padding:14px 0;font-size:12px;color:var(--tx3)}
+.mv-bc a{color:var(--tx3);transition:color .2s}.mv-bc a:hover{color:var(--acc)}
+
+/* ── Footer ──────────────────────────────────────────────────────────────────── */
+.mv-footer{
+  background:#fff;border-top:1.5px solid var(--brd2);
+  padding:48px 0 24px;margin-top:80px;
+}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--tx)}
+.footer-links h6{font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.footer-links a{display:block;color:var(--tx2);font-size:13px;margin-bottom:10px;transition:color .2s}
+.footer-links a:hover{color:var(--acc)}
+
+/* ── Coupon Tag ──────────────────────────────────────────────────────────────── */
+.coupon-tag{
+  background:#FFF0F4;border:1.5px dashed var(--brd);color:var(--acc);
+  border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;letter-spacing:1px;
+}
+
+/* ── Order Status Badges ─────────────────────────────────────────────────────── */
+.order-status{display:inline-flex;align-items:center;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px}
+.status-confirmed{background:#FFF0F4;color:var(--acc)}
+.status-shipped{background:#EDE9FF;color:#7C3AED}
+.status-delivered{background:#ECFDF5;color:#059669}
+.status-cancelled{background:#FEF2F2;color:#DC2626}
+.status-processing,.status-packed{background:#E0F2FE;color:#0284C7}
+.status-out_for_delivery{background:#FFF7ED;color:#EA580C}
+.status-return_requested,.status-returned{background:#FEFCE8;color:#CA8A04}
+.status-refund_initiated,.status-refunded{background:#F0FDF4;color:#16A34A}
+
+/* ── Hover-lift utility ──────────────────────────────────────────────────────── */
+.mv-hover{transition:transform .2s,box-shadow .2s}
+.mv-hover:hover{transform:translateY(-3px);box-shadow:0 8px 24px var(--shadow)}
+
+/* ── Dropdown ────────────────────────────────────────────────────────────────── */
+.dropdown-menu{
+  background:#fff!important;border:1.5px solid var(--brd2)!important;
+  border-radius:14px!important;padding:8px!important;
+  box-shadow:0 8px 32px var(--shadow)!important;
+}
+.dropdown-item{color:var(--tx2)!important;font-size:13px!important;border-radius:8px!important}
+.dropdown-item:hover{background:var(--bg3)!important;color:var(--acc)!important}
+
+@media(max-width:768px){
+  .nav-search{display:none}
+  .mv-navbar .container-fluid{padding:12px 16px}
+}
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ── Ticker ─────────────────────────────────────────────────────────────────── -->
+<div class="ticker">
+  <div class="ticker-inner">
+    {% for _ in "12345678" %}
+    <span class="ticker-item">🌸 FREE SHIPPING ABOVE ₹999</span>
+    <span class="ticker-item">✨ NEW ARRIVALS LIVE</span>
+    <span class="ticker-item">💳 EMI AVAILABLE</span>
+    <span class="ticker-item">🎁 USE CODE WELCOME10 — 10% OFF</span>
+    <span class="ticker-item">📦 EASY 30-DAY RETURNS</span>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────────────────── -->
+<nav class="mv-navbar">
+  <div class="container-fluid">
+    <a href="{% url 'store:home' %}" class="mv-logo">
+      <div class="mv-logo-icon">👔</div> ManVault
+    </a>
+    <div class="nav-search">
+      <form action="{% url 'store:shop' %}" method="GET">
+        <i class="bi bi-search si"></i>
+        <input type="text" name="q" placeholder="Search products, brands, categories..." value="{{ request.GET.q }}">
+      </form>
+    </div>
+    <div class="nav-actions">
+      <a href="{% url 'store:offers' %}" class="icon-btn" title="Offers & Coupons">🏷️</a>
+      <a href="{% url 'store:wishlist' %}" class="icon-btn" title="Wishlist">
+        <i class="bi bi-heart"></i>
+        {% if wishlist_count %}<span class="icon-badge">{{ wishlist_count }}</span>{% endif %}
+      </a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'notifications:list' %}" class="icon-btn" title="Notifications">
+          <i class="bi bi-bell"></i>
+          {% if notif_count %}<span class="icon-badge">{{ notif_count }}</span>{% endif %}
+        </a>
+        {% if user.is_staff %}
+          <a href="{% url 'dashboard:home' %}" class="icon-btn" title="Admin Dashboard">
+            <i class="bi bi-speedometer2"></i>
+          </a>
+        {% endif %}
+        <div class="dropdown">
+          <div class="icon-btn" data-bs-toggle="dropdown" style="cursor:pointer">
+            <i class="bi bi-person"></i>
+          </div>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li style="padding:10px 16px;border-bottom:1px solid var(--brd2);margin-bottom:4px">
+              <div style="font-weight:700;font-size:13px;color:var(--tx)">{{ user.full_name }}</div>
+              <div style="font-size:11px;color:var(--tx3)">{{ user.email }}</div>
+              <div style="font-size:10px;color:var(--acc);margin-top:3px;font-weight:700">⭐ {{ user.loyalty_points }} pts</div>
+            </li>
+            <li><a href="{% url 'accounts:profile' %}" class="dropdown-item">👤 Profile</a></li>
+            <li><a href="{% url 'orders:order_list' %}" class="dropdown-item">📦 My Orders</a></li>
+            <li><a href="{% url 'accounts:logout' %}" class="dropdown-item" style="color:#DC2626!important">🚪 Sign Out</a></li>
+          </ul>
+        </div>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="mv-btn-outline" style="padding:8px 14px;font-size:12px">Sign In</a>
+        
+      {% endif %}
+      <a href="{% url 'store:cart' %}" class="cart-btn">
+        <i class="bi bi-bag"></i> Bag
+        {% if cart_count %}<span style="background:rgba(255,255,255,.25);border-radius:50px;padding:1px 7px;font-size:11px">{{ cart_count }}</span>{% endif %}
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Category Nav ────────────────────────────────────────────────────────────── -->
+<div class="cat-nav">
+  <a href="{% url 'store:shop' %}" {% if request.path == '/shop/' %}class="active"{% endif %}>🏪 All</a>
+  {% for cat in cats_for_nav %}
+  <a href="{% url 'store:category' cat.slug %}">{{ cat.icon }} {{ cat.name }}</a>
+  {% endfor %}
+  <a href="{% url 'store:offers' %}" style="color:var(--acc);font-weight:800">🔥 Offers</a>
+</div>
+
+<!-- ── Flash Messages ──────────────────────────────────────────────────────────── -->
+<div class="mv-alerts" id="mv-alerts">
+{% for message in messages %}
+  <div class="mv-alert {{ message.tags }}">
+    {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill"></i>
+    {% elif message.tags == 'error' %}<i class="bi bi-x-circle-fill"></i>
+    {% else %}<i class="bi bi-info-circle-fill"></i>{% endif %}
+    {{ message }}
+  </div>
+{% endfor %}
+</div>
+
+{% block content %}{% endblock %}
+
+<!-- ── Footer ─────────────────────────────────────────────────────────────────── -->
+<footer class="mv-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="footer-logo mb-2">👔 ManVault</div>
+        <p style="color:var(--tx2);font-size:13px;line-height:1.7">Premium men's fashion for the modern gentleman. Quality first, always.</p>
+        <div class="d-flex gap-2 mt-3">
+          <div class="icon-btn mv-hover"><i class="bi bi-instagram"></i></div>
+          <div class="icon-btn mv-hover"><i class="bi bi-twitter"></i></div>
+          <div class="icon-btn mv-hover"><i class="bi bi-facebook"></i></div>
+        </div>
+      </div>
+      <div class="col-sm-4 col-lg-2 footer-links">
+        <h6>Shop</h6>
+        <a href="{% url 'store:shop' %}">All Products</a>
+        <a href="{% url 'store:shop' %}?badge=new">New Arrivals</a>
+        <a href="{% url 'store:shop' %}?badge=sale">Sale</a>
+        <a href="{% url 'store:offers' %}">Offers & Coupons</a>
+      </div>
+      <div class="col-sm-4 col-lg-2 footer-links">
+        <h6>Help</h6>
+        <a href="#">Size Guide</a>
+        <a href="#">Track Order</a>
+        <a href="#">Returns</a>
+        <a href="#">Contact Us</a>
+      </div>
+      <div class="col-sm-4 col-lg-2 footer-links">
+        <h6>Account</h6>
+        {% if user.is_authenticated %}
+        <a href="{% url 'accounts:profile' %}">My Profile</a>
+        <a href="{% url 'orders:order_list' %}">My Orders</a>
+        <a href="{% url 'store:wishlist' %}">Wishlist</a>
+        {% else %}
+        <a href="{% url 'accounts:login' %}">Sign In</a>
+        <a href="{% url 'accounts:register' %}">Register</a>
+        {% endif %}
+      </div>
+      <div class="col-lg-2 footer-links">
+        <h6>Policy</h6>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms</a>
+        <a href="#">Shipping Policy</a>
+      </div>
+    </div>
+    <hr style="border-color:var(--brd2);margin:32px 0 20px">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <p style="color:var(--tx3);font-size:12px">© 2024 ManVault. All rights reserved.</p>
+      <div class="d-flex gap-2" style="font-size:18px">💳🏧🔒</div>
+    </div>
+  </div>
+</footer>
+
+<div class="mv-toast-cont" id="toast-cont"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Auto-dismiss alerts
+setTimeout(()=>document.querySelectorAll('.mv-alert').forEach(el=>{
+  el.style.transition='opacity .5s';el.style.opacity='0';
+  setTimeout(()=>el.remove(),500);
+}),4000);
+
+function showToast(msg,type='success'){
+  const c=document.getElementById('toast-cont');
+  const t=document.createElement('div');t.className='mv-toast';
+  t.innerHTML=`<span style="color:var(--acc);font-size:16px">${type==='success'?'✓':'ℹ'}</span>${msg}`;
+  c.appendChild(t);setTimeout(()=>t.remove(),3500);
+}
+
+// AJAX cart
+document.querySelectorAll('.ajax-add-cart').forEach(btn=>{
+  btn.addEventListener('click',async function(e){
+    e.preventDefault();
+    const pid=this.dataset.pid;
+    const res=await fetch(`/cart/add/${pid}/`,{method:'POST',headers:{
+      'X-CSRFToken':'{{ csrf_token }}','X-Requested-With':'XMLHttpRequest'
+    }});
+    const data=await res.json();
+    if(data.success){
+      document.querySelectorAll('.cart-count-badge').forEach(el=>el.textContent=data.count);
+      showToast(data.message);
+      this.textContent='✓ Added';this.classList.add('in-cart');
+    }
+  });
+});
+
+// AJAX wishlist
+document.querySelectorAll('.ajax-wish').forEach(btn=>{
+  btn.addEventListener('click',async function(e){
+    e.preventDefault();
+    {% if not user.is_authenticated %}window.location='/accounts/login/';return;{% endif %}
+    const pid=this.dataset.pid;
+    const res=await fetch(`/wishlist/toggle/${pid}/`,{method:'POST',headers:{
+      'X-CSRFToken':'{{ csrf_token }}','X-Requested-With':'XMLHttpRequest'
+    }});
+    const data=await res.json();
+    this.classList.toggle('active',data.added);
+    showToast(data.added?'Added to wishlist ❤️':'Removed from wishlist','info');
+  });
+});
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

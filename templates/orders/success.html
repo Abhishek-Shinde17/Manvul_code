@@ -1,0 +1,31 @@
+{% extends 'base.html' %}{% block title %}Order Placed! — ManVault{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:600px">
+  <div class="mv-card p-5 text-center">
+    <div style="font-size:72px;margin-bottom:16px">🎉</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;margin-bottom:8px">Order Placed!</h1>
+    <p style="color:var(--tx3);margin-bottom:24px">Thank you for shopping with ManVault!</p>
+    <div style="background:var(--bg3);border:1px solid var(--brd);border-radius:14px;padding:20px;margin-bottom:20px">
+      <div style="font-size:11px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Order Number</div>
+      <div style="font-size:28px;font-weight:800;color:var(--acc)">{{ order.order_number }}</div>
+      <div style="font-size:13px;color:var(--tx3);margin-top:6px">₹{{ order.total }} · {{ order.get_payment_method_display }}</div>
+    </div>
+    <div style="background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.2);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
+      <div style="font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px"><i class="bi bi-shield-check" style="color:var(--acc)"></i> Delivery OTP Sent</div>
+      <div style="font-size:13px;color:var(--tx2)">A 6-digit OTP has been sent to <strong>{{ order.user.email }}</strong>. Share this OTP with the delivery person to confirm delivery.</div>
+    </div>
+    {% if order.loyalty_points_earned > 0 %}
+    <div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:14px;margin-bottom:20px;font-size:13px">⭐ You earned <strong style="color:#A855F7">{{ order.loyalty_points_earned }} loyalty points</strong> on this order!</div>
+    {% endif %}
+    <div class="row g-3 text-start mb-4">
+      <div class="col-6"><div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Ship To</div><div style="font-size:13px;font-weight:600">{{ order.shipping_name }}</div><div style="font-size:12px;color:var(--tx2)">{{ order.shipping_city }}, {{ order.shipping_state }}</div></div>
+      <div class="col-6"><div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Est. Delivery</div><div style="font-size:13px;font-weight:600;color:var(--acc)">{{ order.estimated_delivery|date:"d M Y" }}</div></div>
+    </div>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{% url 'orders:track_order' order.order_number %}" class="mv-btn"><i class="bi bi-geo-alt"></i> Track Order</a>
+      <a href="{% url 'orders:download_invoice' order.order_number %}" class="mv-btn-outline"><i class="bi bi-download"></i> Invoice</a>
+      <a href="{% url 'store:shop' %}" class="mv-btn-outline">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

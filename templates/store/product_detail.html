@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} — ManVault{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <!-- Breadcrumb -->
+  <div class="mv-bc mb-3">
+    <a href="{% url 'store:home' %}">Home</a> /
+    {% if product.category %}<a href="{% url 'store:category' product.category.slug %}">{{ product.category.name }}</a> / {% endif %}
+    <span style="color:var(--tx2)">{{ product.name }}</span>
+  </div>
+
+  <div class="row g-5 mb-5">
+    <!-- Images -->
+    <div class="col-md-5">
+      <div style="position:sticky;top:80px">
+        <div style="aspect-ratio:3/4;background:var(--bg3);border-radius:20px;overflow:hidden;margin-bottom:12px;border:1px solid var(--brd)" id="main-img-wrap">
+          {% if product.main_image %}
+          <img src="{{ product.main_image.image.url }}" id="main-img" style="width:100%;height:100%;object-fit:cover;transition:opacity .2s" alt="{{ product.name }}">
+          {% else %}
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px">👔</div>
+          {% endif %}
+        </div>
+        <div class="d-flex gap-2 overflow-auto pb-1">
+          {% for img in product.images.all %}
+          <div onclick="switchImg('{{ img.image.url }}')" style="width:72px;height:90px;flex-shrink:0;border-radius:12px;overflow:hidden;border:2px solid {% if img.is_primary %}var(--acc){% else %}var(--brd){% endif %};cursor:pointer;transition:border-color .2s" class="thumb-img">
+            <img src="{{ img.image.url }}" style="width:100%;height:100%;object-fit:cover">
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="col-md-7">
+      {% if product.badge %}<span class="badge-{{ product.badge }}" style="font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:1.5px">{{ product.badge|upper }}</span>{% endif %}
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3vw,38px);font-weight:700;margin:10px 0 6px;line-height:1.1">{{ product.name }}</h1>
+      {% if product.brand %}<div style="font-size:13px;color:var(--tx3);margin-bottom:12px">by <span style="color:var(--tx2);font-weight:600">{{ product.brand.name }}</span></div>{% endif %}
+
+      <!-- Rating -->
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div style="background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.2);border-radius:8px;padding:4px 12px;display:flex;align-items:center;gap:6px">
+          <span style="color:var(--acc);font-weight:800">{{ product.rating }}</span>
+          <span style="color:#FFD600">★</span>
+        </div>
+        <span style="font-size:13px;color:var(--tx3)">{{ product.review_count }} reviews</span>
+        <span style="font-size:13px;color:var(--tx3)">{{ product.sales_count }} sold</span>
+      </div>
+
+      <!-- Price -->
+      <div class="d-flex align-items-center gap-3 mb-2">
+        <span style="font-size:34px;font-weight:800">₹{{ product.price }}</span>
+        {% if product.original_price %}
+        <span style="font-size:18px;color:var(--tx3);text-decoration:line-through">₹{{ product.original_price }}</span>
+        <span style="background:rgba(200,255,0,.15);color:var(--acc);font-size:13px;font-weight:800;padding:4px 10px;border-radius:8px">{{ product.discount_percent }}% OFF</span>
+        {% endif %}
+      </div>
+      {% if product.original_price %}
+      <div style="font-size:12px;color:var(--acc);margin-bottom:16px">You save ₹{{ product.original_price|add:"-0"|floatformat:0 }}</div>
+      {% endif %}
+
+      <!-- Active Offers -->
+      {% if active_offers %}
+      <div style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);border-radius:12px;padding:12px 16px;margin-bottom:16px">
+        <div style="font-size:11px;color:#FF6B35;font-weight:800;margin-bottom:6px">🔥 OFFERS AVAILABLE</div>
+        {% for offer in active_offers %}
+        <div style="font-size:13px;color:var(--tx2);margin-bottom:4px">⚡ {{ offer.name }} — {{ offer.discount_percent }}% OFF</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Add to Cart Form -->
+      <form method="POST" action="{% url 'store:add_to_cart' product.id %}" id="add-form">
+        {% csrf_token %}
+        <!-- Variants -->
+        {% if product.variants.exists %}
+        <div class="mb-4">
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Select Size</div>
+          <div class="d-flex gap-2 flex-wrap" id="size-btns">
+            {% for v in product.variants.all %}
+            <button type="button" onclick="selectVariant(this, {{ v.id }})"
+              style="padding:8px 18px;border-radius:10px;border:2px solid var(--brd);background:var(--bg3);color:var(--tx2);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s{% if v.stock == 0 %};opacity:.4;cursor:not-allowed{% endif %}"
+              {% if v.stock == 0 %}disabled{% endif %}
+              data-vid="{{ v.id }}">
+              {{ v.size }}{% if v.extra_price > 0 %} +₹{{ v.extra_price }}{% endif %}
+            </button>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="variant_id" id="variant_id">
+          <div style="font-size:11px;color:var(--tx3);margin-top:8px"><a href="#" style="color:var(--acc)">📏 Size Guide</a></div>
+        </div>
+        {% endif %}
+
+        <!-- Stock -->
+        <div style="font-size:13px;margin-bottom:20px">
+          {% if product.stock > 0 %}
+          <span style="color:var(--acc)">✓ In Stock</span> <span style="color:var(--tx3)">({{ product.stock }} left)</span>
+          {% if product.stock <= 5 %}<span style="background:rgba(255,51,102,.1);color:#FF3366;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;margin-left:8px">Only {{ product.stock }} left!</span>{% endif %}
+          {% else %}<span style="color:#FF3366">✗ Out of Stock</span>{% endif %}
+        </div>
+
+        <div class="d-flex gap-3 flex-wrap">
+          {% if product.stock > 0 %}
+          <button type="submit" class="mv-btn" style="padding:16px 32px;font-size:15px"><i class="bi bi-bag-plus"></i> Add to Bag</button>
+          {% else %}
+          <button disabled class="mv-btn" style="opacity:.4;cursor:not-allowed;padding:16px 32px;font-size:15px">Out of Stock</button>
+          {% endif %}
+          <button type="button" class="mv-btn-outline ajax-wish" data-pid="{{ product.id }}" style="padding:16px 20px;font-size:15px{% if in_wishlist %};border-color:#FF3366;color:#FF3366{% endif %}">
+            {% if in_wishlist %}❤️{% else %}🤍{% endif %}
+          </button>
+        </div>
+      </form>
+
+      <!-- USP Row -->
+      <div class="d-flex gap-4 mt-4 pt-4" style="border-top:1px solid var(--brd)">
+        <div style="text-align:center"><div style="font-size:22px">🚚</div><div style="font-size:10px;color:var(--tx3);margin-top:4px">Free Delivery<br>above ₹999</div></div>
+        <div style="text-align:center"><div style="font-size:22px">🔄</div><div style="font-size:10px;color:var(--tx3);margin-top:4px">30-Day<br>Returns</div></div>
+        <div style="text-align:center"><div style="font-size:22px">✅</div><div style="font-size:10px;color:var(--tx3);margin-top:4px">100%<br>Authentic</div></div>
+        <div style="text-align:center"><div style="font-size:22px">⭐</div><div style="font-size:10px;color:var(--tx3);margin-top:4px">Earn Loyalty<br>Points</div></div>
+      </div>
+
+      <!-- Description -->
+      {% if product.description %}
+      <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--brd)">
+        <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Product Details</div>
+        <p style="font-size:14px;color:var(--tx2);line-height:1.8">{{ product.description }}</p>
+        {% if product.material %}<div style="font-size:13px;color:var(--tx3);margin-top:8px">Material: {{ product.material }}</div>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-8">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;margin-bottom:20px">Customer Reviews ({{ reviews.count }})</h2>
+      {% if user.is_authenticated %}
+      <div class="mv-card p-4 mb-4">
+        <h6 style="font-size:13px;font-weight:700;margin-bottom:14px">Write a Review</h6>
+        <form method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <div style="font-size:11px;color:var(--tx3);margin-bottom:6px">Rating</div>
+            <div class="d-flex gap-2">
+              {% for i in "12345" %}
+              <label style="cursor:pointer;font-size:24px">
+                <input type="radio" name="rating" value="{{ forloop.counter }}" style="display:none" required> ⭐
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="mb-3"><input type="text" name="title" placeholder="Review title (optional)" class="mv-input"></div>
+          <div class="mb-3"><textarea name="body" placeholder="Share your experience..." class="mv-input" rows="3" required></textarea></div>
+          <button type="submit" class="mv-btn mv-btn-sm">Post Review</button>
+        </form>
+      </div>
+      {% endif %}
+      {% for review in reviews %}
+      <div class="mv-card p-4 mb-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <div style="width:32px;height:32px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--acctx)">{{ review.user.first_name|first|upper }}</div>
+              <span style="font-weight:600;font-size:14px">{{ review.user.get_full_name|default:review.user.username }}</span>
+              {% if review.verified_purchase %}<span style="font-size:10px;color:var(--acc);background:rgba(200,255,0,.1);padding:2px 8px;border-radius:4px">✓ Verified</span>{% endif %}
+            </div>
+            <div style="color:#FFD600;font-size:14px">{% for _ in review.rating|make_list %}★{% endfor %}</div>
+          </div>
+          <span style="font-size:12px;color:var(--tx3)">{{ review.created_at|date:"d M Y" }}</span>
+        </div>
+        {% if review.title %}<div style="font-weight:700;font-size:14px;margin-bottom:4px">{{ review.title }}</div>{% endif %}
+        <p style="font-size:13px;color:var(--tx2);line-height:1.6">{{ review.body }}</p>
+      </div>
+      {% empty %}
+      <div style="text-align:center;padding:40px;color:var(--tx3)">No reviews yet. Be the first to review!</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  {% if related %}
+  <div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;margin-bottom:20px">You May Also Like</h2>
+    <div class="row g-3">{% for p in related %}{% include 'store/partials/product_card.html' %}{% endfor %}</div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+function switchImg(url){
+  document.getElementById('main-img').style.opacity=0;
+  setTimeout(()=>{document.getElementById('main-img').src=url;document.getElementById('main-img').style.opacity=1;},150);
+}
+function selectVariant(btn, vid){
+  document.querySelectorAll('#size-btns button').forEach(b=>{b.style.borderColor='var(--brd)';b.style.color='var(--tx2)';b.style.background='var(--bg3)';});
+  btn.style.borderColor='var(--acc)';btn.style.color='var(--acc)';btn.style.background='rgba(200,255,0,.08)';
+  document.getElementById('variant_id').value=vid;
+}
+</script>
+{% endblock %}

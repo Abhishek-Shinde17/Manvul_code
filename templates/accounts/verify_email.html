@@ -1,0 +1,17 @@
+{% extends 'base.html' %}{% block title %}Verify Email — ManVault{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:480px">
+  <div class="mv-card p-5 text-center">
+    <div style="font-size:64px;margin-bottom:16px">📧</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;margin-bottom:8px">Check Your Email</h1>
+    <p style="color:var(--tx2);font-size:14px;margin-bottom:24px">We sent a 6-digit OTP to <strong style="color:var(--acc)">{{ user.email }}</strong>. Enter it below to verify your account.</p>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="text" name="otp" maxlength="6" placeholder="• • • • • •" class="mv-input" style="text-align:center;font-size:28px;font-weight:800;letter-spacing:12px;margin-bottom:16px" autofocus>
+      <button type="submit" class="mv-btn w-100 justify-content-center" style="padding:14px">Verify & Continue</button>
+    </form>
+    <div style="margin-top:16px;font-size:13px;color:var(--tx3)">Didn't receive? <a href="{% url 'accounts:resend_otp' %}" style="color:var(--acc)">Resend OTP</a></div>
+    <div style="font-size:12px;color:var(--tx4);margin-top:8px">OTP expires in 10 minutes</div>
+  </div>
+</div>
+{% endblock %}

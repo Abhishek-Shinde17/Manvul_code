@@ -1,0 +1,66 @@
+{% extends 'base.html' %}{% block title %}My Account — ManVault{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="section-title mb-4">My Account</h1>
+  <div class="row g-4">
+    <div class="col-md-3">
+      <div class="mv-card p-4 text-center mb-3">
+        {% if user.avatar %}<img src="{{ user.avatar.url }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px">
+        {% else %}<div style="width:80px;height:80px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--acctx);margin:0 auto 12px;font-weight:800">{{ user.first_name|first|upper }}</div>{% endif %}
+        <div style="font-weight:700;font-size:15px">{{ user.full_name }}</div>
+        <div style="font-size:11px;color:var(--tx3)">{{ user.email }}</div>
+        {% if user.email_verified %}<div style="font-size:10px;color:var(--acc);margin-top:4px">✓ Verified</div>{% endif %}
+        <div style="background:rgba(168,85,247,.12);border-radius:10px;padding:10px;margin-top:12px"><div style="font-size:22px;font-weight:800;color:#A855F7">{{ user.loyalty_points }}</div><div style="font-size:10px;color:var(--tx3)">LOYALTY POINTS</div><div style="font-size:11px;color:var(--tx3)">= ₹{{ user.loyalty_points|divisibleby:10 }} value</div></div>
+        {% if user.is_staff %}<a href="{% url 'dashboard:home' %}" class="mv-btn mt-3 w-100 justify-content-center mv-btn-sm"><i class="bi bi-speedometer2"></i> Admin Panel</a>{% endif %}
+      </div>
+      <div class="mv-card p-3">
+        <a href="{% url 'accounts:profile' %}" class="d-flex align-items-center gap-10 px-3 py-2" style="padding:10px 12px;border-radius:8px;background:rgba(200,255,0,.06);color:var(--acc);font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px"><i class="bi bi-person"></i> Profile</a>
+        <a href="{% url 'orders:order_list' %}" style="display:flex;align-items:center;gap:8px;padding:10px 12px;color:var(--tx2);font-size:13px;border-radius:8px;transition:background .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><i class="bi bi-bag"></i> My Orders</a>
+        <a href="{% url 'store:wishlist' %}" style="display:flex;align-items:center;gap:8px;padding:10px 12px;color:var(--tx2);font-size:13px;border-radius:8px;transition:background .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><i class="bi bi-heart"></i> Wishlist ({{ wishlist_count }})</a>
+        <a href="{% url 'notifications:list' %}" style="display:flex;align-items:center;gap:8px;padding:10px 12px;color:var(--tx2);font-size:13px;border-radius:8px;transition:background .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><i class="bi bi-bell"></i> Notifications</a>
+        <a href="{% url 'accounts:logout' %}" style="display:flex;align-items:center;gap:8px;padding:10px 12px;color:#FF3366;font-size:13px;border-radius:8px;margin-top:4px"><i class="bi bi-box-arrow-right"></i> Sign Out</a>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="mv-card p-4 mb-4">
+        <h5 style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:20px">Edit Profile</h5>
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">First Name</label>{{ form.first_name }}</div>
+            <div class="col-md-6"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Last Name</label>{{ form.last_name }}</div>
+            <div class="col-md-6"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Email</label>{{ form.email }}</div>
+            <div class="col-md-6"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Phone</label>{{ form.phone }}</div>
+            <div class="col-md-6"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Date of Birth</label>{{ form.date_of_birth }}</div>
+            <div class="col-md-6"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Gender</label>{{ form.gender }}</div>
+            <div class="col-12"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Profile Photo</label>{{ form.avatar }}</div>
+          </div>
+          <button type="submit" class="mv-btn mt-3">Save Changes</button>
+        </form>
+      </div>
+      <div class="mv-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 style="font-family:'Cormorant Garamond',serif;font-size:22px">Saved Addresses</h5>
+          <a href="{% url 'accounts:add_address' %}" class="mv-btn mv-btn-sm"><i class="bi bi-plus"></i> Add</a>
+        </div>
+        {% for addr in addresses %}
+        <div style="background:var(--bg3);border:1px solid var(--brd);border-radius:12px;padding:16px;margin-bottom:10px">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="d-flex gap-2 align-items-center mb-1"><span style="font-size:10px;background:var(--acc);color:var(--acctx);padding:2px 8px;border-radius:4px;font-weight:800">{{ addr.label|upper }}</span>{% if addr.is_default %}<span style="font-size:10px;color:var(--acc)">Default</span>{% endif %}</div>
+              <div style="font-weight:600">{{ addr.full_name }}</div>
+              <div style="font-size:13px;color:var(--tx2)">{{ addr.line1 }}, {{ addr.city }}, {{ addr.state }} — {{ addr.pincode }}</div>
+              <div style="font-size:12px;color:var(--tx3)">📞 {{ addr.phone }}</div>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="{% url 'accounts:edit_address' addr.id %}" class="icon-btn" style="width:32px;height:32px;font-size:12px"><i class="bi bi-pencil"></i></a>
+              <a href="{% url 'accounts:delete_address' addr.id %}" class="icon-btn" style="width:32px;height:32px;font-size:12px;border-color:#FF3366;color:#FF3366" onclick="return confirm('Delete?')"><i class="bi bi-trash"></i></a>
+            </div>
+          </div>
+        </div>
+        {% empty %}<p style="color:var(--tx3);font-size:13px">No addresses yet.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

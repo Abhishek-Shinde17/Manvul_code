@@ -1,0 +1,14 @@
+{% extends 'dashboard/base.html' %}{% block title %}{% if coupon %}Edit Coupon{% else %}New Coupon{% endif %}{% endblock %}{% block page_title %}{% if coupon %}Edit Coupon: {{ coupon.code }}{% else %}Create New Coupon{% endif %}{% endblock %}
+{% block content %}<div style="max-width:760px">
+<a href="{% url 'dashboard:coupons' %}" style="font-size:13px;color:var(--tx3);display:inline-flex;gap:6px;margin-bottom:20px">← Coupons</a>
+<div class="stat-card p-4">
+  <form method="POST">{% csrf_token %}
+    <div class="row g-3">
+      {% for field in form %}
+      <div class="col-md-6"><label style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">{{ field.label }}</label>{{ field }}{% if field.errors %}<div style="color:#FF3366;font-size:11px">{{ field.errors.0 }}</div>{% endif %}</div>
+      {% endfor %}
+    </div>
+    <div class="d-flex gap-3 mt-4"><button type="submit" class="mv-btn">Save Coupon</button><a href="{% url 'dashboard:coupons' %}" class="mv-btn-outline">Cancel</a></div>
+  </form>
+</div>
+</div>{% endblock %}

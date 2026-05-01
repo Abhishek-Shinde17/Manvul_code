@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Shop — ManVault{% endblock %}
+{% block content %}
+<div class="container-fluid py-4" style="max-width:1400px">
+  <div class="row g-4">
+    <!-- Filters Sidebar -->
+    <div class="col-lg-2">
+      <div class="mv-card p-3" style="position:sticky;top:80px">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--tx3)">Filters</span>
+          <a href="{% url 'store:shop' %}" style="font-size:11px;color:var(--acc)">Clear All</a>
+        </div>
+        <form method="GET" id="filter-form">
+          {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+          <!-- Category -->
+          <div class="mb-4">
+            <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Category</div>
+            {% for cat in categories %}
+            <label style="display:flex;align-items:center;gap-8px;margin-bottom:8px;cursor:pointer;font-size:13px;color:{% if selected_cat == cat.slug %}var(--acc){% else %}var(--tx2){% endif %}">
+              <input type="radio" name="category" value="{{ cat.slug }}" {% if selected_cat == cat.slug %}checked{% endif %} onchange="this.form.submit()" style="accent-color:var(--acc);margin-right:8px">{{ cat.icon }} {{ cat.name }}
+            </label>
+            {% endfor %}
+          </div>
+          <!-- Price Range -->
+          <div class="mb-4">
+            <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Price Range</div>
+            <input type="number" name="min_price" placeholder="Min ₹" value="{{ min_price }}" class="mv-input" style="margin-bottom:8px;padding:8px 12px!important">
+            <input type="number" name="max_price" placeholder="Max ₹" value="{{ max_price }}" class="mv-input" style="padding:8px 12px!important">
+          </div>
+          <!-- Badge -->
+          <div class="mb-4">
+            <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Collection</div>
+            {% for val,lbl in badges %}
+            <label style="display:flex;align-items:center;margin-bottom:8px;cursor:pointer;font-size:13px;color:{% if badge == val %}var(--acc){% else %}var(--tx2){% endif %}">
+              <input type="radio" name="badge" value="{{ val }}" {% if badge == val %}checked{% endif %} onchange="this.form.submit()" style="accent-color:var(--acc);margin-right:8px">{{ lbl }}
+            </label>
+            {% endfor %}
+          </div>
+          <button type="submit" class="mv-btn w-100 justify-content-center" style="padding:10px;font-size:12px">Apply</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="col-lg-10">
+      <!-- Toolbar -->
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          {% if q %}<span style="font-size:14px;color:var(--tx2)">Results for "<strong style="color:var(--tx)">{{ q }}</strong>"</span>{% endif %}
+          <span style="font-size:12px;color:var(--tx3)">{{ total_products }} products found</span>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+          <span style="font-size:12px;color:var(--tx3)">Sort:</span>
+          <select name="sort" form="filter-form" onchange="document.getElementById('filter-form').submit()" class="mv-input" style="width:auto;padding:8px 12px!important;font-size:12px!important">
+            <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>Newest First</option>
+            <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+            <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Top Rated</option>
+            <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Most Popular</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Active Filters -->
+      {% if selected_cat or min_price or max_price or badge %}
+      <div class="d-flex gap-2 flex-wrap mb-3">
+        {% if selected_cat %}<a href="?{% if q %}q={{ q }}&{% endif %}sort={{ sort }}" style="background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);color:var(--acc);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">{{ selected_cat }} ✕</a>{% endif %}
+        {% if badge %}<a href="?{% if q %}q={{ q }}&{% endif %}sort={{ sort }}&{% if selected_cat %}category={{ selected_cat }}{% endif %}" style="background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);color:var(--acc);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">{{ badge }} ✕</a>{% endif %}
+        {% if min_price or max_price %}<span style="background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);color:var(--acc);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">₹{{ min_price }} – ₹{{ max_price }}</span>{% endif %}
+      </div>
+      {% endif %}
+
+      {% if products %}
+      <div class="row g-3">
+        {% for p in products %}{% include 'store/partials/product_card.html' %}{% endfor %}
+      </div>
+      <!-- Pagination -->
+      {% if products.has_other_pages %}
+      <div class="d-flex justify-content-center gap-2 mt-5">
+        {% if products.has_previous %}<a href="?page={{ products.previous_page_number }}&sort={{ sort }}&category={{ selected_cat }}&badge={{ badge }}&q={{ q }}" class="mv-btn-outline" style="padding:8px 16px;font-size:13px">← Prev</a>{% endif %}
+        <span style="padding:9px 18px;background:var(--acc);color:var(--acctx);border-radius:12px;font-weight:800;font-size:13px">{{ products.number }} / {{ products.paginator.num_pages }}</span>
+        {% if products.has_next %}<a href="?page={{ products.next_page_number }}&sort={{ sort }}&category={{ selected_cat }}&badge={{ badge }}&q={{ q }}" class="mv-btn-outline" style="padding:8px 16px;font-size:13px">Next →</a>{% endif %}
+      </div>
+      {% endif %}
+      {% else %}
+      <div style="text-align:center;padding:80px 0">
+        <div style="font-size:64px;margin-bottom:16px">🔍</div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px">No products found</h3>
+        <p style="color:var(--tx3);margin-top:8px">Try different filters or search terms</p>
+        <a href="{% url 'store:shop' %}" class="mv-btn mt-4">Browse All</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

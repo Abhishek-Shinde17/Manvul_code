@@ -1,0 +1,94 @@
+{% extends 'base.html' %}{% block title %}Offers & Coupons — ManVault{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="section-title mb-1">🏷️ Offers & Coupons</h1>
+  <p style="color:var(--tx3);font-size:13px;margin-bottom:32px">Exclusive deals, discounts and coupon codes just for you</p>
+
+  <!-- Active Offers -->
+  {% if offers %}
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;margin-bottom:16px">🔥 Active Offers</h2>
+  <div class="row g-3 mb-5">
+    {% for offer in offers %}
+    <div class="col-md-6 col-lg-4">
+      <div class="mv-card p-4" style="border-color:rgba(200,255,0,.2);position:relative;overflow:hidden">
+        <div style="position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:var(--acc);opacity:.05;border-radius:50%"></div>
+        <div style="font-size:10px;font-weight:800;color:var(--acc);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">{{ offer.get_offer_type_display }}</div>
+        <div style="font-size:18px;font-weight:800;margin-bottom:6px">{{ offer.name }}</div>
+        <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px">{{ offer.description }}</div>
+        {% if offer.discount_percent %}<div style="font-size:28px;font-weight:800;color:var(--acc)">{{ offer.discount_percent }}% OFF</div>{% endif %}
+        {% if offer.discount_flat %}<div style="font-size:28px;font-weight:800;color:var(--acc)">₹{{ offer.discount_flat }} OFF</div>{% endif %}
+        <div style="display:flex;gap:8px;margin-top:12px;font-size:11px;color:var(--tx3)">
+          <span>📅 Till {{ offer.valid_to|date:"d M Y" }}</span>
+          <span>⏱ {{ offer.time_remaining }}</span>
+        </div>
+        <a href="{% url 'store:shop' %}" class="mv-btn mt-3" style="font-size:12px;padding:10px 18px">Shop Now</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Coupon Codes -->
+  {% if coupons %}
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;margin-bottom:16px">🎟️ Coupon Codes</h2>
+  <div class="row g-3">
+    {% for coupon in coupons %}
+    <div class="col-md-6">
+      <div class="mv-card p-4" style="border-style:dashed;border-color:rgba(200,255,0,.3)">
+        <div class="d-flex justify-content-between align-items-start">
+          <div style="flex:1">
+            <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Coupon Code</div>
+            <div style="font-size:20px;font-weight:800;color:var(--acc);letter-spacing:3px;font-family:monospace;margin-bottom:8px" id="code-{{ coupon.id }}">{{ coupon.code }}</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">
+              {% if coupon.discount_type == 'flat' %}₹{{ coupon.value }} OFF{% else %}{{ coupon.value }}% OFF{% endif %}
+              {% if coupon.max_discount %} (max ₹{{ coupon.max_discount }}){% endif %}
+            </div>
+            {% if coupon.description %}<div style="font-size:12px;color:var(--tx3);margin-bottom:6px">{{ coupon.description }}</div>{% endif %}
+            <div style="font-size:11px;color:var(--tx3)">
+              Min order: ₹{{ coupon.min_order }} &nbsp;|&nbsp; Valid till {{ coupon.valid_to|date:"d M Y" }}
+              {% if coupon.first_order_only %}&nbsp;|&nbsp; <span style="color:var(--acc)">First order only</span>{% endif %}
+            </div>
+          </div>
+          <button onclick="copyCoupon('{{ coupon.code }}', this)" class="mv-btn mv-btn-sm" style="flex-shrink:0;margin-left:16px;font-size:11px">
+            <i class="bi bi-clipboard"></i> Copy
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if not offers and not coupons %}
+  <div style="text-align:center;padding:80px 0">
+    <div style="font-size:64px;margin-bottom:16px">🏷️</div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px">No active offers right now</h3>
+    <p style="color:var(--tx3);margin-top:8px">Check back soon for amazing deals!</p>
+    <a href="{% url 'store:shop' %}" class="mv-btn mt-4">Browse Products</a>
+  </div>
+  {% endif %}
+
+  <!-- How to use coupons -->
+  <div class="mv-card p-4 mt-5">
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:16px">How to Use Coupons</h3>
+    <div class="row g-3">
+      {% for step, desc in steps_list %}
+          <p><strong>{{ step }}</strong>: {{ desc }}</p>
+      {% endfor %}
+      <div class="col-md-3"><div style="display:flex;gap:12px;align-items:flex-start"><div style="width:28px;height:28px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--acctx);flex-shrink:0">1</div><div><div style="font-size:13px;font-weight:700">Add to Bag</div><div style="font-size:12px;color:var(--tx3)">Pick products you love</div></div></div></div>
+      <div class="col-md-3"><div style="display:flex;gap:12px;align-items:flex-start"><div style="width:28px;height:28px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--acctx);flex-shrink:0">2</div><div><div style="font-size:13px;font-weight:700">Go to Bag</div><div style="font-size:12px;color:var(--tx3)">Open your shopping bag</div></div></div></div>
+      <div class="col-md-3"><div style="display:flex;gap:12px;align-items:flex-start"><div style="width:28px;height:28px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--acctx);flex-shrink:0">3</div><div><div style="font-size:13px;font-weight:700">Enter Code</div><div style="font-size:12px;color:var(--tx3)">Type the coupon code</div></div></div></div>
+      <div class="col-md-3"><div style="display:flex;gap:12px;align-items:flex-start"><div style="width:28px;height:28px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--acctx);flex-shrink:0">4</div><div><div style="font-size:13px;font-weight:700">Save Money!</div><div style="font-size:12px;color:var(--tx3)">Discount applied instantly</div></div></div></div>
+    </div>
+  </div>
+</div>
+<script>
+function copyCoupon(code, btn){
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.innerHTML='<i class="bi bi-check"></i> Copied!';
+    btn.style.background='var(--bg3)';btn.style.color='var(--acc)';
+    setTimeout(()=>{btn.innerHTML='<i class="bi bi-clipboard"></i> Copy';btn.style.background='';btn.style.color='';},2000);
+  });
+}
+</script>
+{% endblock %}
