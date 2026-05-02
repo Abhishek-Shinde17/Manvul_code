@@ -5,11 +5,17 @@ from django.db.models import Q, Avg
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.views.decorators.http import require_GET
 from .models import (Product, Category, Brand, Cart, CartItem, Wishlist,
                      Review, ProductVariant, Coupon, CouponUsage, SpecialOffer)
 from .forms import ReviewForm
 
 BADGE_CHOICES = [('new','New Arrivals'),('hot','Hot Deals'),('sale','On Sale'),('trending','Trending')]
+
+@require_GET
+def health_check(request):
+    """Lightweight health check endpoint for Railway. No DB or auth required."""
+    return JsonResponse({'status': 'ok'})
 
 def get_or_create_cart(request):
     if request.user.is_authenticated:
