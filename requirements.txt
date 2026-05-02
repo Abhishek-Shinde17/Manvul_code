@@ -9,3 +9,4 @@ qrcode>=7.4
 requests
 PyJWT
 cryptography
+gunicorn
