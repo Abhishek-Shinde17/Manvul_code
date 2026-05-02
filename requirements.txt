@@ -6,3 +6,4 @@ django-allauth>=0.57.0
 pyotp>=2.9.0
 reportlab>=4.0
 qrcode>=7.4
+requests
