@@ -98,13 +98,14 @@ LOGOUT_REDIRECT_URL = '/'
 CSRF_TRUSTED_ORIGINS = [
     "https://*.cloudshell.dev",
     "https://*.ngrok-free.app",
-    "https://*.ngrok-free.dev"
+    "https://*.ngrok-free.dev",
+    "https://manvulcode-production.up.railway.app"
 ]
 # ── django-allauth core ───────────────────────────────────────────────────────
 ACCOUNT_LOGIN_METHODS         = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS         = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION    = 'none'
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'    # change to 'https' in production
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'    # change to 'https' in production
 
 # Force allauth's own pages to redirect to OUR custom pages
 ACCOUNT_LOGIN_URL  = '/accounts/login/'
